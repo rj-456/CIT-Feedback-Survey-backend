@@ -8,13 +8,9 @@ const Feedback = require('./models/Feedback');
 
 const app = express();
 app.use(express.json());
-
-// Allow connections from anywhere (We will lock this down in Phase 4)
 app.use(cors({ origin: '*' }));
-
 app.use(express.static('public'));
 
-// --- AES-256-CBC ENCRYPTION ALGORITHM ---
 const ALGORITHM = 'aes-256-cbc';
 const AES_KEY = Buffer.from(process.env.AES_KEY, 'utf8');
 
@@ -34,33 +30,33 @@ function decryptAES(encryptedData, ivHex) {
     return decrypted;
 }
 
-// --- DATABASE CONNECTION ---
 mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log('Connected to MongoDB Atlas'))
     .catch(err => console.error('MongoDB connection error:', err));
 
-// --- API ROUTES ---
-
-// 1. Submit Feedback (Encrypts Email & Message)
+// 1. Submit Feedback (Encrypts ALL fields)
 app.post('/api/feedback', async (req, res) => {
     try {
-        const { role, name, email, rating, feedbackText } = req.body;
-        
-        const encFeedback = encryptAES(feedbackText);
+
+        const { classification, name, email, rating, feedbackText } = req.body;     
+        const encClassification = encryptAES(classification);
+        const encName = encryptAES(name);
+        const encRating = encryptAES(rating.toString());
         const encEmail = encryptAES(email);
+        const encFeedback = encryptAES(feedbackText);
 
         const newFeedback = new Feedback({
-            role, name, rating,
-            encryptedEmail: encEmail.encryptedData,
-            emailIv: encEmail.iv,
-            encryptedFeedback: encFeedback.encryptedData,
-            feedbackIv: encFeedback.iv
+            classification: encClassification.encryptedData, classificationIv: encClassification.iv,
+            name: encName.encryptedData, nameIv: encName.iv,
+            rating: encRating.encryptedData, ratingIv: encRating.iv,
+            encryptedEmail: encEmail.encryptedData, emailIv: encEmail.iv,
+            encryptedFeedback: encFeedback.encryptedData, feedbackIv: encFeedback.iv
         });
         
         await newFeedback.save();
-        res.status(201).json({ message: 'Feedback securely encrypted and submitted!' });
+        res.status(201).json({ message: 'Feedback fully encrypted and submitted!' });
     } catch (error) {
-        res.status(500).json({ error: 'Server error during submission' });
+        res.status(500).json({ error: 'Server error' });
     }
 });
 
@@ -68,37 +64,56 @@ app.post('/api/feedback', async (req, res) => {
 app.post('/api/admin/login', (req, res) => {
     const { username, password } = req.body;
     if (username === process.env.ADMIN_USER && password === process.env.ADMIN_PASS) {
-        const token = jwt.sign({ role: 'admin' }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ classification: 'admin' }, process.env.JWT_SECRET, { expiresIn: '1h' });
         res.json({ token });
     } else {
         res.status(401).json({ error: 'Invalid credentials' });
     }
 });
 
-// 3. Fetch & Decrypt Data for Admin Dashboard
+// 3. Get Encrypted Dashboard Data
 app.get('/api/admin/feedbacks', async (req, res) => {
     const token = req.headers['authorization'];
     if (!token) return res.status(403).json({ error: 'No token provided' });
-
     try {
         jwt.verify(token, process.env.JWT_SECRET);
         const feedbacks = await Feedback.find().sort({ createdAt: -1 });
-        
-        const decryptedFeedbacks = feedbacks.map(item => ({
-            id: item._id,
-            role: item.role,
-            name: item.name,
-            rating: item.rating,
-            date: item.createdAt,
-            decryptedEmail: decryptAES(item.encryptedEmail, item.emailIv),
-            decryptedMessage: decryptAES(item.encryptedFeedback, item.feedbackIv)
-        }));
-
-        res.json(decryptedFeedbacks);
-    } catch (error) {
-        res.status(401).json({ error: 'Decryption failed or Unauthorized' });
-    }
+        res.json(feedbacks.map(f => ({
+            id: f._id,
+            date: f.createdAt,
+            encClassification: f.classification, 
+            encName: f.name,
+            encRating: f.rating,
+            encEmail: f.encryptedEmail,
+            encMsg: f.encryptedFeedback
+        })));
+    } catch (error) { res.status(401).json({ error: 'Unauthorized' }); }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Backend running on port ${PORT}`));
+// 4. Decrypt All Fields
+app.post('/api/admin/decrypt/:id', async (req, res) => {
+    const token = req.headers['authorization'];
+    try {
+        jwt.verify(token, process.env.JWT_SECRET);
+        const f = await Feedback.findById(req.params.id);
+        res.json({
+            classification: decryptAES(f.classification, f.classificationIv),
+            name: decryptAES(f.name, f.nameIv),
+            rating: decryptAES(f.rating, f.ratingIv),
+            email: decryptAES(f.encryptedEmail, f.emailIv),
+            message: decryptAES(f.encryptedFeedback, f.feedbackIv)
+        });
+    } catch (error) { res.status(500).json({ error: 'Decryption failed' }); }
+});
+
+// 5. Delete Feedback
+app.delete('/api/admin/feedback/:id', async (req, res) => {
+    const token = req.headers['authorization'];
+    try {
+        jwt.verify(token, process.env.JWT_SECRET);
+        await Feedback.findByIdAndDelete(req.params.id);
+        res.json({ message: 'Deleted' });
+    } catch (error) { res.status(401).json({ error: 'Unauthorized' }); }
+});
+
+app.listen(3000, () => console.log('Running on 3000'));

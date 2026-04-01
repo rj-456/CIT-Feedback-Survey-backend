@@ -1,11 +1,15 @@
 const mongoose = require('mongoose');
 
-const FeedbackSchema = new mongoose.Schema({
-    role: { type: String, required: true }, 
-    name: { type: String, required: true },
-    rating: { type: Number, required: true, min: 1, max: 5 },
+const feedbackSchema = new mongoose.Schema({
+    // Encrypted Identification
+    classification: { type: String, required: true }, 
+    classificationIv: { type: String, required: true },
+    name: { type: String, required: true }, 
+    nameIv: { type: String, required: true },
     
-    // Encrypted Data Fields
+    // Encrypted Data
+    rating: { type: String, required: true }, 
+    ratingIv: { type: String, required: true },
     encryptedEmail: { type: String, required: true },
     emailIv: { type: String, required: true },
     encryptedFeedback: { type: String, required: true },
@@ -14,4 +18,4 @@ const FeedbackSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('Feedback', FeedbackSchema);
+module.exports = mongoose.model('Feedback', feedbackSchema);

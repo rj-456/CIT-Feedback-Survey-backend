@@ -2,95 +2,425 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>CIT Admin Dashboard</title>
+    <title>UA-CIT Secure Admin Portal</title>
     <style>
-        body { font-family: Arial; padding: 20px; max-width: 600px; margin: auto; background-color: #f4f4f9; }
-        .card { background: white; border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        input, button { padding: 10px; margin: 5px 0; width: 100%; box-sizing: border-box; }
-        button { background: #333; color: white; border: none; cursor: pointer; }
+        /* Premium UA & CIT Color Palette */
+        :root {
+            --ua-blue: #004785;         
+            --ua-blue-hover: #003366;   
+            --cit-grey: #8a9aa9;        
+            --cit-grey-light: #e2e8f0;  
+            --bg-color: #f4f7f9;        
+            --card-bg: #ffffff;         
+            --cipher-bg: #111827;       
+            --cipher-text: #38bdf8;     
+            --danger: #ef4444;          
+            --danger-hover: #dc2626;
+            --warning-gold: #eab308;    
+        }
+
+        body { 
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            padding: 40px 20px; 
+            max-width: 950px; 
+            margin: auto; 
+            background-color: var(--bg-color); 
+            color: #334155; 
+            line-height: 1.6;
+        }
+
+        /* Header Styling */
+      /* Adjusted Header for Side-by-Side Layout */
+        .portal-header {
+            display: flex;
+            align-items: center;      /* Vertically centers the logo and text */
+            justify-content: center;  /* Centers the entire block on the page */
+            gap: 25px;                /* Perfect spacing between logo and text */
+            margin-bottom: 30px; 
+            padding-bottom: 25px; 
+            border-bottom: 1px solid var(--cit-grey-light);
+        }
+        
+        .header-titles {
+            text-align: left;         /* Left-aligns the text next to the logo */
+        }
+
+        .portal-header h1 { 
+            color: var(--ua-blue); 
+            margin: 0 0 4px 0; 
+            font-size: 2.2em; 
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+        
+        .portal-header h2 { 
+            color: var(--cit-grey); 
+            margin: 0; 
+            font-size: 1.15em; 
+            font-weight: 500; 
+        }
+
+        /* Improved Logo Styling for Inline */
+        .ua-logo {
+            width: 105px;             /* Slightly adjusted to match text height perfectly */
+            height: auto;
+            margin: 0;                /* Removed bottom margin since it's inline now */
+            border-radius: 50%; 
+            mix-blend-mode: multiply; 
+            filter: drop-shadow(0 4px 8px rgba(0, 71, 133, 0.1)); 
+            flex-shrink: 0;           /* Prevents the logo from squishing on smaller screens */
+        }
+
+        /* Tighter Login Section Alignment */
+        #loginSection { 
+            background: var(--card-bg); 
+            padding: 40px; 
+            border-radius: 12px; 
+            text-align: center; 
+            margin-top: 30px; /* Pulled up closer to the header line */
+            box-shadow: 0 10px 30px rgba(0, 71, 133, 0.08); 
+            border-top: 6px solid var(--ua-blue); 
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        #loginSection h2 { margin-top: 0; color: var(--ua-blue); }
+
+        /* Dashboard & Header Layout */
+        .dashboard-header {
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 30px;
+        }
+        .dashboard-header h3 {
+            color: var(--ua-blue); 
+            margin: 0; 
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Dashboard Cards */
+        .card { 
+            background: var(--card-bg); 
+            border-left: 8px solid var(--ua-blue); 
+            padding: 30px; 
+            margin-bottom: 30px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .card:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 12px 25px rgba(0, 71, 133, 0.08);
+        }
+
+        /* Inputs & Buttons */
+        input { 
+            padding: 14px 16px; 
+            margin: 10px 0; 
+            width: 100%; 
+            box-sizing: border-box; 
+            border-radius: 8px; 
+            border: 1px solid var(--cit-grey-light); 
+            background: #f8fafc; 
+            color: #334155; 
+            font-size: 1em;
+            transition: all 0.2s;
+        }
+        input:focus { 
+            outline: none; 
+            border-color: var(--ua-blue); 
+            box-shadow: 0 0 0 4px rgba(0, 71, 133, 0.1); 
+            background: var(--card-bg);
+        }
+
+        button { 
+            padding: 10px 20px; 
+            border-radius: 8px; 
+            border: none; 
+            cursor: pointer; 
+            font-weight: 600; 
+            font-size: 0.95em;
+            transition: all 0.2s ease; 
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        button:active { transform: scale(0.97); }
+
+        .btn-primary { background: var(--ua-blue); color: var(--card-bg); box-shadow: 0 4px 6px rgba(0, 71, 133, 0.2); }
+        .btn-primary:hover { background: var(--ua-blue-hover); box-shadow: 0 6px 12px rgba(0, 71, 133, 0.3); }
+        .btn-danger { background: var(--danger); color: var(--card-bg); box-shadow: 0 4px 6px rgba(239, 68, 68, 0.2); }
+        .btn-danger:hover { background: var(--danger-hover); box-shadow: 0 6px 12px rgba(239, 68, 68, 0.3); }
+        .btn-secondary { background: var(--cit-grey); color: var(--card-bg); }
+        .btn-secondary:hover { background: #64748b; }
+
+        /* Logo Styling */
+        .ua-logo {
+            width: 130px; /* Adjust this value to make the logo bigger or smaller */
+            height: auto;
+            margin-bottom: 15px;
+            /* Adds a very subtle blue shadow to the logo to make it pop */
+            filter: drop-shadow(0 4px 8px rgba(0, 71, 133, 0.15)); 
+        }
+
+        /* --- DATA DISPLAY STATES --- */
+        
+        /* 1. Encrypted State (Cipher) */
+        .cipher { 
+            font-family: 'Courier New', Consolas, monospace; 
+            color: #475569; /* Dark grey text for readability */
+            background: #f8fafc; /* Very soft, light background instead of dark */
+            border: 1px dashed var(--cit-grey); /* Dashed border to indicate raw/encrypted data */
+            word-break: break-all; 
+        }
+        .cipher-pill {
+            padding: 6px 16px; 
+            border-radius: 20px; 
+            font-size: 0.9em; 
+            display: inline-block;
+            letter-spacing: 0.5px;
+        }
+        .cipher-block {
+            display: block; 
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 0.95em;
+            letter-spacing: 0.5px;
+        }
+
+        /* 2. Decrypted State (Clean & Readable) */
+        .decrypted-inline { 
+            color: var(--ua-blue); 
+            font-family: 'Inter', system-ui, sans-serif; 
+            font-weight: 700;
+            font-size: 1.05em;
+            background: transparent;
+            padding: 4px 8px;
+            border-bottom: 2px solid var(--cit-grey-light);
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        .decrypted-block { 
+            background: #f8fafc; 
+            color: #334155; 
+            padding: 18px 20px; 
+            border-radius: 0 8px 8px 0; 
+            border-left: 4px solid var(--ua-blue); 
+            font-family: 'Inter', system-ui, sans-serif; 
+            font-weight: 400;
+            font-size: 1em;
+            line-height: 1.6;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            transition: all 0.3s ease;
+        }
+
+        /* Layout for Data Rows */
+        .data-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+        .label-strong { 
+            color: var(--ua-blue); 
+            font-weight: 700; 
+            min-width: 180px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.05em;
+        }
+        .message-container {
+            margin-bottom: 25px;
+            margin-top: 10px;
+        }
+        .action-bar {
+            display: flex; 
+            gap: 15px; 
+            border-top: 1px solid var(--cit-grey-light); 
+            padding-top: 20px;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
-    <h2>CIT Admin Dashboard</h2>
-    
-    <div id="loginSection">
-        <p>Log in to decrypt and view feedback.</p>
-        <input type="text" id="username" placeholder="Username"><br>
-        <input type="password" id="password" placeholder="Password"><br>
-        <button onclick="login()">Login</button>
-        <p id="loginError" style="color:red;"></p>
+<div class="portal-header">
+        <img src="ua-logo.png" alt="University of the Assumption Logo" class="ua-logo">
+        <div class="header-titles">
+            <h1>University of the Assumption</h1>
+            <h2>College of Information Technology Office Feedback Survey</h2>
+        </div>
     </div>
 
-    <div id="dashboardSection" style="display:none;">
-        <button onclick="logout()" style="background: #dc3545; width: auto; float: right;">Logout</button>
-        <h3>Decrypted Survey Responses:</h3>
-        <div id="feedbacks"></div>
+    <div id="loginSection">
+        <h2 style="margin-bottom: 25px;">🛡️ Secure Admin Portal</h2>
+        <input type="text" id="user" placeholder="Admin Username">
+        <input type="password" id="pass" placeholder="Password">
+        <button class="btn-primary" onclick="login()" style="width: 100%; margin-top: 20px; padding: 14px; font-size: 1.1em;">Authenticate Login</button>
+    </div>
+
+    <div id="dashboard" style="display:none;">
+        <div class="dashboard-header">
+            <h3><span style="font-size: 1.2em;">🔐</span> Encrypted Feedback Vault</h3>
+            <button class="btn-danger" onclick="localStorage.clear(); location.reload();" style="padding: 12px 24px;">Log Out</button>
+        </div>
+        <div id="list"></div>
     </div>
 
     <script>
-        // Because this HTML is on the backend, we just use relative paths!
-        if (localStorage.getItem('adminToken')) showDashboard();
+        const cipherStorage = {};
+
+        if (localStorage.getItem('adminToken')) show();
 
         async function login() {
             const res = await fetch('/api/admin/login', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    username: document.getElementById('username').value,
-                    password: document.getElementById('password').value
-                })
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({username: user.value, password: pass.value})
             });
             const data = await res.json();
-            if (data.token) {
-                localStorage.setItem('adminToken', data.token);
-                showDashboard();
+            if (data.token) { 
+                localStorage.setItem('adminToken', data.token); 
+                show(); 
             } else {
-                document.getElementById('loginError').innerText = "Invalid credentials";
+                alert("Invalid Credentials");
             }
         }
 
-        function logout() {
-            localStorage.removeItem('adminToken');
-            document.getElementById('loginSection').style.display = 'block';
-            document.getElementById('dashboardSection').style.display = 'none';
-        }
-
-        async function showDashboard() {
+        async function show() {
             document.getElementById('loginSection').style.display = 'none';
-            document.getElementById('dashboardSection').style.display = 'block';
-
-            const token = localStorage.getItem('adminToken');
-            const res = await fetch('/api/admin/feedbacks', {
-                headers: { 'Authorization': token }
+            document.getElementById('dashboard').style.display = 'block';
+            
+            const res = await fetch('/api/admin/feedbacks', { 
+                headers: {'Authorization': localStorage.getItem('adminToken')} 
             });
-            
-            if(res.status === 401 || res.status === 403) return logout();
-            
             const feedbacks = await res.json();
-            const container = document.getElementById('feedbacks');
-            container.innerHTML = '';
             
-            feedbacks.forEach(f => {
-                const stars = '★'.repeat(f.rating) + '☆'.repeat(5 - f.rating);
-                container.innerHTML += `
-                    <div class="card">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <strong style="font-size: 1.1em;">${f.name} <span style="color: #666; font-size: 0.8em;">(${f.role})</span></strong>
-                            <span style="color: gold; font-size: 1.3em;">${stars}</span>
-                        </div>
-                        <div style="color: #444; font-size: 0.9em; margin: 10px 0;">
-                            <strong>📧 Email:</strong> ${f.decryptedEmail}
-                        </div>
-                        <div style="background: #f0f4f8; padding: 10px; border-left: 4px solid #0056b3; border-radius: 4px;">
-                            <strong>Message:</strong><br>
-                            ${f.decryptedMessage}
-                        </div>
-                        <div style="font-size: 0.8em; color: #888; margin-top: 10px;">
-                            Date: ${new Date(f.date).toLocaleString()}
+            const list = document.getElementById('list');
+            list.innerHTML = feedbacks.map(f => `
+                <div class="card" id="card-${f.id}">
+                    <div class="data-row">
+                        <span class="label-strong">🔐 Name / Class:</span> 
+                        <span class="cipher cipher-pill" id="name-${f.id}">${f.encName}</span>
+                        <span class="cipher cipher-pill" id="classification-${f.id}">${f.encClassification}</span>
+                    </div>
+                    
+                    <div class="data-row">
+                        <span class="label-strong">🔐 Rating:</span> 
+                        <span class="cipher cipher-pill" id="rate-${f.id}">${f.encRating}</span>
+                    </div>
+                    
+                    <div class="data-row" style="margin-bottom: 5px;">
+                        <span class="label-strong">🔐 Message:</span>
+                    </div>
+                    <div class="message-container">
+                        <div class="cipher cipher-block" id="msg-container-${f.id}">
+                            <span id="msg-${f.id}">${f.encMsg}</span>
                         </div>
                     </div>
-                `;
+
+                    <div class="action-bar">
+                        <button class="btn-primary" onclick="decryptItem('${f.id}')" id="btn-${f.id}">🔓 Decrypt Data</button>
+                        <button class="btn-danger" onclick="del('${f.id}')">🗑️ Delete Record</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function decryptItem(id) {
+            const token = localStorage.getItem('adminToken');
+            const btn = document.getElementById(`btn-${id}`);
+            
+            // Store original cipher data
+            cipherStorage[id] = {
+                name: document.getElementById(`name-${id}`).innerText,
+                classification: document.getElementById(`classification-${id}`).innerText,
+                rating: document.getElementById(`rate-${id}`).innerText,
+                msg: document.getElementById(`msg-${id}`).innerText
+            };
+
+            try {
+                const res = await fetch(`/api/admin/decrypt/${id}`, { 
+                    method: 'POST', 
+                    headers: {'Authorization': token} 
+                });
+                const d = await res.json();
+
+                // Swap to Decrypted Inline Styles
+                const nameEl = document.getElementById(`name-${id}`);
+                nameEl.innerText = d.name;
+                nameEl.className = 'decrypted-inline';
+
+                const classEl = document.getElementById(`classification-${id}`);
+                classEl.innerText = d.classification;
+                classEl.className = 'decrypted-inline';
+
+                // Handle Rating Stars
+                const rateEl = document.getElementById(`rate-${id}`);
+                rateEl.innerText = '★'.repeat(d.rating);
+                rateEl.className = 'decrypted-inline';
+                rateEl.style.color = 'var(--warning-gold)';
+                rateEl.style.borderBottom = 'none';
+                rateEl.style.fontSize = '1.2em';
+                
+                // Swap to Decrypted Block Style
+                const msgContainer = document.getElementById(`msg-container-${id}`);
+                msgContainer.className = 'decrypted-block';
+                document.getElementById(`msg-${id}`).innerText = d.message;
+
+                // Update Button
+                btn.innerText = "🔒 Encrypt Back";
+                btn.className = "btn-secondary";
+                btn.onclick = () => encryptBack(id);
+            } catch (error) {
+                alert("Decryption failed.");
+            }
+        }
+
+        function encryptBack(id) {
+            const btn = document.getElementById(`btn-${id}`);
+            const data = cipherStorage[id];
+
+            // Revert to Cipher Pill Styles
+            const nameEl = document.getElementById(`name-${id}`);
+            nameEl.innerText = data.name;
+            nameEl.className = 'cipher cipher-pill';
+
+            const classEl = document.getElementById(`classification-${id}`);
+            classEl.innerText = data.classification;
+            classEl.className = 'cipher cipher-pill';
+
+            const rateEl = document.getElementById(`rate-${id}`);
+            rateEl.innerText = data.rating;
+            rateEl.className = 'cipher cipher-pill';
+            rateEl.style.color = '';
+            rateEl.style.borderBottom = '';
+            rateEl.style.fontSize = '';
+            
+            // Revert to Cipher Block Style
+            const msgContainer = document.getElementById(`msg-container-${id}`);
+            msgContainer.className = 'cipher cipher-block'; 
+            document.getElementById(`msg-${id}`).innerText = data.msg;
+
+            // Update Button
+            btn.innerText = "🔓 Decrypt Data";
+            btn.className = "btn-primary";
+            btn.onclick = () => decryptItem(id);
+        }
+
+        async function del(id) {
+            if (!confirm("Are you sure you want to permanently delete this record?")) return;
+            const res = await fetch(`/api/admin/feedback/${id}`, { 
+                method: 'DELETE', 
+                headers: {'Authorization': localStorage.getItem('adminToken')} 
             });
+            if (res.ok) document.getElementById(`card-${id}`).remove();
         }
     </script>
 </body>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MILITARY GRADE Test Survey</title>
+    <style>
+        body { font-family: 'Courier New', monospace; background-color: #1a1a1a; color: #00ff00; padding: 20px; max-width: 500px; margin: auto; }
+        .container { border: 2px solid #00ff00; padding: 20px; border-radius: 8px; box-shadow: 0 0 15px #00ff00; }
+        label { font-weight: bold; margin-top: 10px; display: block; }
+        input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 15px; box-sizing: border-box; background: #000; color: #00ff00; border: 1px solid #00ff00; }
+        button { padding: 12px; background: #00ff00; color: #000; font-weight: bold; border: none; cursor: pointer; width: 100%; font-size: 1.1em; }
+        button:hover { background: #fff; box-shadow: 0 0 20px #fff; }
+        .status-msg { text-align: center; margin-top: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 style="text-align: center;">🛠️ SECURE INJECTION TEST</h2>
+        <p style="font-size: 0.8em; color: #888;">Testing AES-256 encryption for: Name, Classification, Rating, Email, and Feedback.</p>
+        
+        <form id="testForm">
+            <label>Classification:</label>
+            <select id="classification" required>
+                <option value="Student">Student</option>
+                <option value="Guardian">Guardian</option>
+                <option value="Others">Others</option>
+            </select>
+
+            <label>Full Name:</label>
+            <input type="text" id="name" placeholder="Target Name" required>
+
+            <label>Email:</label>
+            <input type="email" id="email" placeholder="secure@cit.edu" required>
+
+            <label>Rating (1-5):</label>
+            <select id="rating" required>
+                <option value="5">5 - Excellent</option>
+                <option value="4">4 - Good</option>
+                <option value="3">3 - Average</option>
+                <option value="2">2 - Fair</option>
+                <option value="1">1 - Poor</option>
+            </select>
+            
+            <label>Sensitive Feedback:</label>
+            <textarea id="feedback" placeholder="Message to be encrypted..." required style="height: 100px;"></textarea>
+            
+            <button type="submit">GENERATE CIPHERTEXT & SEND</button>
+        </form>
+        
+        <div id="status" class="status-msg"></div>
+    </div>
+
+    <script>
+        document.getElementById('testForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const statusBox = document.getElementById('status');
+            statusBox.innerText = ">> ENCRYPTING DATA...";
+            statusBox.style.color = "yellow";
+
+            const payload = {
+                classification: document.getElementById('classification').value,
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                rating: document.getElementById('rating').value, // Sent as string for encryption
+                feedbackText: document.getElementById('feedback').value
+            };
+
+            try {
+                const response = await fetch('/api/feedback', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    statusBox.innerText = ">> SUCCESS: DATA VAULTED";
+                    statusBox.style.color = "#00ffff";
+                    e.target.reset();
+                } else {
+                    statusBox.innerText = ">> ERROR: UPLOAD FAILED";
+                    statusBox.style.color = "red";
+                }
+            } catch (err) {
+                statusBox.innerText = ">> CRITICAL: SERVER OFFLINE";
+                statusBox.style.color = "red";
+            }
+        });
+    </script>
+</body>
+</html>
