@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CIT Admin Dashboard</title>
+    <style>
+        body { font-family: Arial; padding: 20px; max-width: 600px; margin: auto; background-color: #f4f4f9; }
+        .card { background: white; border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        input, button { padding: 10px; margin: 5px 0; width: 100%; box-sizing: border-box; }
+        button { background: #333; color: white; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h2>CIT Admin Dashboard</h2>
+    
+    <div id="loginSection">
+        <p>Log in to decrypt and view feedback.</p>
+        <input type="text" id="username" placeholder="Username"><br>
+        <input type="password" id="password" placeholder="Password"><br>
+        <button onclick="login()">Login</button>
+        <p id="loginError" style="color:red;"></p>
+    </div>
+
+    <div id="dashboardSection" style="display:none;">
+        <button onclick="logout()" style="background: #dc3545; width: auto; float: right;">Logout</button>
+        <h3>Decrypted Survey Responses:</h3>
+        <div id="feedbacks"></div>
+    </div>
+
+    <script>
+        // Because this HTML is on the backend, we just use relative paths!
+        if (localStorage.getItem('adminToken')) showDashboard();
+
+        async function login() {
+            const res = await fetch('/api/admin/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username: document.getElementById('username').value,
+                    password: document.getElementById('password').value
+                })
+            });
+            const data = await res.json();
+            if (data.token) {
+                localStorage.setItem('adminToken', data.token);
+                showDashboard();
+            } else {
+                document.getElementById('loginError').innerText = "Invalid credentials";
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('adminToken');
+            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('dashboardSection').style.display = 'none';
+        }
+
+        async function showDashboard() {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('dashboardSection').style.display = 'block';
+
+            const token = localStorage.getItem('adminToken');
+            const res = await fetch('/api/admin/feedbacks', {
+                headers: { 'Authorization': token }
+            });
+            
+            if(res.status === 401 || res.status === 403) return logout();
+            
+            const feedbacks = await res.json();
+            const container = document.getElementById('feedbacks');
+            container.innerHTML = '';
+            
+            feedbacks.forEach(f => {
+                const stars = '★'.repeat(f.rating) + '☆'.repeat(5 - f.rating);
+                container.innerHTML += `
+                    <div class="card">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <strong style="font-size: 1.1em;">${f.name} <span style="color: #666; font-size: 0.8em;">(${f.role})</span></strong>
+                            <span style="color: gold; font-size: 1.3em;">${stars}</span>
+                        </div>
+                        <div style="color: #444; font-size: 0.9em; margin: 10px 0;">
+                            <strong>📧 Email:</strong> ${f.decryptedEmail}
+                        </div>
+                        <div style="background: #f0f4f8; padding: 10px; border-left: 4px solid #0056b3; border-radius: 4px;">
+                            <strong>Message:</strong><br>
+                            ${f.decryptedMessage}
+                        </div>
+                        <div style="font-size: 0.8em; color: #888; margin-top: 10px;">
+                            Date: ${new Date(f.date).toLocaleString()}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+    </script>
+</body>
+</html>

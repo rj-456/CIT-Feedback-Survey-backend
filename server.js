@@ -12,6 +12,8 @@ app.use(express.json());
 // Allow connections from anywhere (We will lock this down in Phase 4)
 app.use(cors({ origin: '*' }));
 
+app.use(express.static('public'));
+
 // --- AES-256-CBC ENCRYPTION ALGORITHM ---
 const ALGORITHM = 'aes-256-cbc';
 const AES_KEY = Buffer.from(process.env.AES_KEY, 'utf8');
