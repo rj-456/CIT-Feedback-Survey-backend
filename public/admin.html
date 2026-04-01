@@ -45,7 +45,6 @@
             transform: translateX(-3px); 
         }
 
-        /* Header Styling */
         .portal-header {
             display: flex;
             align-items: center;      
@@ -95,7 +94,6 @@
             margin-left: auto;
             margin-right: auto;
         }
-        #loginSection h2 { margin-top: 0; color: var(--ua-blue); }
 
         .dashboard-header {
             display: flex; 
@@ -119,11 +117,16 @@
             margin-bottom: 30px; 
             border-radius: 12px; 
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-        .card:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 12px 25px rgba(0, 71, 133, 0.08);
+
+        .timestamp {
+            font-size: 0.85em;
+            color: var(--cit-grey);
+            font-weight: 500;
+            margin-bottom: 12px;
+            display: block;
+            border-bottom: 1px solid var(--cit-grey-light);
+            padding-bottom: 5px;
         }
 
         input { 
@@ -135,14 +138,6 @@
             border: 1px solid var(--cit-grey-light); 
             background: #f8fafc; 
             color: #334155; 
-            font-size: 1em;
-            transition: all 0.2s;
-        }
-        input:focus { 
-            outline: none; 
-            border-color: var(--ua-blue); 
-            box-shadow: 0 0 0 4px rgba(0, 71, 133, 0.1); 
-            background: var(--card-bg);
         }
 
         button { 
@@ -151,106 +146,39 @@
             border: none; 
             cursor: pointer; 
             font-weight: 600; 
-            font-size: 0.95em;
             transition: all 0.2s ease; 
             display: inline-flex;
             align-items: center;
-            justify-content: center;
             gap: 8px;
         }
-        button:active { transform: scale(0.97); }
 
-        .btn-primary { background: var(--ua-blue); color: var(--card-bg); box-shadow: 0 4px 6px rgba(0, 71, 133, 0.2); }
-        .btn-primary:hover { background: var(--ua-blue-hover); box-shadow: 0 6px 12px rgba(0, 71, 133, 0.3); }
-        .btn-danger { background: var(--danger); color: var(--card-bg); box-shadow: 0 4px 6px rgba(239, 68, 68, 0.2); }
-        .btn-danger:hover { background: var(--danger-hover); box-shadow: 0 6px 12px rgba(239, 68, 68, 0.3); }
+        .btn-primary { background: var(--ua-blue); color: var(--card-bg); }
+        .btn-danger { background: var(--danger); color: var(--card-bg); }
         .btn-secondary { background: var(--cit-grey); color: var(--card-bg); }
-        .btn-secondary:hover { background: #64748b; }
 
-        /* --- DATA DISPLAY STATES --- */
         .cipher { 
             font-family: 'Courier New', Consolas, monospace; 
             color: #475569; 
             background: #f8fafc; 
             border: 1px dashed var(--cit-grey); 
         }
-        .cipher-pill {
-            padding: 6px 16px; 
-            border-radius: 20px; 
-            font-size: 0.9em; 
-            display: inline-block;
-            letter-spacing: 0.5px;
-        }
-        .cipher-block {
-            display: block; 
-            padding: 16px;
-            border-radius: 8px;
-            font-size: 0.95em;
-            letter-spacing: 0.5px;
-        }
+        .cipher-pill { padding: 6px 16px; border-radius: 20px; font-size: 0.9em; display: inline-block; }
+        .cipher-block { display: block; padding: 16px; border-radius: 8px; }
 
-        .decrypted-inline { 
-            color: var(--ua-blue); 
-            font-family: 'Inter', system-ui, sans-serif; 
-            font-weight: 700;
-            font-size: 1.05em;
-            background: transparent;
-            padding: 4px 8px;
-            border-bottom: 2px solid var(--cit-grey-light);
-            display: inline-block;
-            transition: all 0.3s ease;
-        }
-        .decrypted-block { 
-            background: #f8fafc; 
-            color: #334155; 
-            padding: 18px 20px; 
-            border-radius: 0 8px 8px 0; 
-            border-left: 4px solid var(--ua-blue); 
-            font-family: 'Inter', system-ui, sans-serif; 
-            font-weight: 400;
-            font-size: 1em;
-            line-height: 1.6;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-            transition: all 0.3s ease;
-        }
+        .decrypted-inline { color: var(--ua-blue); font-weight: 700; border-bottom: 2px solid var(--cit-grey-light); display: inline-block; }
+        .decrypted-block { background: #f8fafc; color: #334155; padding: 18px 20px; border-radius: 0 8px 8px 0; border-left: 4px solid var(--ua-blue); }
 
-        .data-row {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 18px;
-            flex-wrap: wrap;
-        }
-        .label-strong { 
-            color: var(--ua-blue); 
-            font-weight: 700; 
-            min-width: 180px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 1.05em;
-        }
-        .message-container {
-            margin-bottom: 25px;
-            margin-top: 10px;
-        }
-        .action-bar {
-            display: flex; 
-            gap: 15px; 
-            border-top: 1px solid var(--cit-grey-light); 
-            padding-top: 20px;
-            margin-top: 10px;
-        }
+        .data-row { display: flex; align-items: center; gap: 15px; margin-bottom: 18px; flex-wrap: wrap; }
+        .label-strong { color: var(--ua-blue); font-weight: 700; min-width: 180px; }
+        .action-bar { display: flex; gap: 15px; border-top: 1px solid var(--cit-grey-light); padding-top: 20px; }
     </style>
 </head>
 <body>
 
-    <a href="/" class="back-link" id="gatewayBtn">
-        <span>←</span> Back to Gateway
-    </a>
+    <a href="/" class="back-link" id="gatewayBtn"><span>←</span> Back to Gateway</a>
 
     <div class="portal-header">
-        <img src="ua-logo.png" alt="University of the Assumption Logo" class="ua-logo">
+        <img src="ua-logo.png" alt="Logo" class="ua-logo">
         <div class="header-titles">
             <h1>University of the Assumption</h1>
             <h2>College of Information Technology Office Feedback Survey</h2>
@@ -261,12 +189,12 @@
         <h2 style="margin-bottom: 25px;">🛡️ Secure Admin Portal</h2>
         <input type="text" id="user" placeholder="Admin Username">
         <input type="password" id="pass" placeholder="Password">
-        <button class="btn-primary" onclick="login()" style="width: 100%; margin-top: 20px; padding: 14px; font-size: 1.1em;">Authenticate Login</button>
+        <button class="btn-primary" onclick="login()" style="width: 100%; margin-top: 20px; padding: 14px;">Authenticate Login</button>
     </div>
 
     <div id="dashboard" style="display:none;">
         <div class="dashboard-header">
-            <h3><span style="font-size: 1.2em;">🔐</span> Encrypted Feedback Vault</h3>
+            <h3>🔐 Encrypted Feedback Vault</h3>
             <button class="btn-danger" onclick="localStorage.clear(); location.reload();" style="padding: 12px 24px;">Log Out</button>
         </div>
         <div id="list"></div>
@@ -287,16 +215,12 @@
             if (data.token) { 
                 localStorage.setItem('adminToken', data.token); 
                 show(); 
-            } else {
-                alert("Invalid Credentials");
-            }
+            } else { alert("Invalid Credentials"); }
         }
 
         async function show() {
             document.getElementById('loginSection').style.display = 'none';
             document.getElementById('dashboard').style.display = 'block';
-            
-            // NEW: Hide the "Back to Gateway" button when showing the dashboard
             document.getElementById('gatewayBtn').style.display = 'none';
             
             const res = await fetch('/api/admin/feedbacks', { 
@@ -305,11 +229,17 @@
             const feedbacks = await res.json();
             
             const list = document.getElementById('list');
-            list.innerHTML = feedbacks.map(f => `
+            list.innerHTML = feedbacks.map(f => {
+                const submissionDate = new Date(f.date).toLocaleString('en-US', {
+                    month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true
+                });
+
+                return `
                 <div class="card" id="card-${f.id}">
-                    
+                    <span class="timestamp">📅 Submitted: ${submissionDate}</span>
+
                     <div class="data-row">
-                        <span class="label-strong">🔐 Name / Class:</span> 
+                        <span class="label-strong">🔐 Name / Classification:</span> 
                         <span class="cipher cipher-pill" id="name-${f.id}">${f.encName}</span>
                         <span class="cipher cipher-pill" id="classification-${f.id}">${f.encClassification}</span>
                     </div>
@@ -324,21 +254,17 @@
                         <span class="cipher cipher-pill" id="rate-${f.id}">${f.encRating}</span>
                     </div>
                     
-                    <div class="data-row" style="margin-bottom: 5px;">
-                        <span class="label-strong">🔐 Message:</span>
-                    </div>
-                    <div class="message-container">
-                        <div class="cipher cipher-block" id="msg-container-${f.id}">
-                            <span id="msg-${f.id}">${f.encMsg}</span>
-                        </div>
+                    <div class="data-row" style="margin-bottom: 5px;"><span class="label-strong">🔐 Message:</span></div>
+                    <div style="margin-bottom: 25px; margin-top: 10px;">
+                        <div class="cipher cipher-block" id="msg-container-${f.id}"><span id="msg-${f.id}">${f.encMsg}</span></div>
                     </div>
 
                     <div class="action-bar">
                         <button class="btn-primary" onclick="decryptItem('${f.id}')" id="btn-${f.id}">🔓 Decrypt Data</button>
                         <button class="btn-danger" onclick="del('${f.id}')">🗑️ Delete Record</button>
                     </div>
-                </div>
-            `).join('');
+                </div>`;
+            }).join('');
         }
 
         async function decryptItem(id) {
@@ -360,24 +286,18 @@
                 });
                 const d = await res.json();
 
-                const nameEl = document.getElementById(`name-${id}`);
-                nameEl.innerText = d.name;
-                nameEl.className = 'decrypted-inline';
-
-                const classEl = document.getElementById(`classification-${id}`);
-                classEl.innerText = d.classification;
-                classEl.className = 'decrypted-inline';
-
-                const emailEl = document.getElementById(`email-${id}`);
-                emailEl.innerText = d.email;
-                emailEl.className = 'decrypted-inline';
+                document.getElementById(`name-${id}`).innerText = d.name;
+                document.getElementById(`name-${id}`).className = 'decrypted-inline';
+                document.getElementById(`classification-${id}`).innerText = d.classification;
+                document.getElementById(`classification-${id}`).className = 'decrypted-inline';
+                document.getElementById(`email-${id}`).innerText = d.email;
+                document.getElementById(`email-${id}`).className = 'decrypted-inline';
 
                 const rateEl = document.getElementById(`rate-${id}`);
                 rateEl.innerText = '★'.repeat(d.rating);
                 rateEl.className = 'decrypted-inline';
                 rateEl.style.color = 'var(--warning-gold)';
                 rateEl.style.borderBottom = 'none';
-                rateEl.style.fontSize = '1.2em';
                 
                 const msgContainer = document.getElementById(`msg-container-${id}`);
                 msgContainer.className = 'decrypted-block';
@@ -386,9 +306,7 @@
                 btn.innerText = "🔒 Encrypt Back";
                 btn.className = "btn-secondary";
                 btn.onclick = () => encryptBack(id);
-            } catch (error) {
-                alert("Decryption failed.");
-            }
+            } catch (error) { alert("Decryption failed."); }
         }
 
         function encryptBack(id) {
@@ -396,23 +314,17 @@
             const data = cipherStorage[id];
 
             const nameEl = document.getElementById(`name-${id}`);
-            nameEl.innerText = data.name;
-            nameEl.className = 'cipher cipher-pill';
+            nameEl.innerText = data.name; nameEl.className = 'cipher cipher-pill';
 
             const classEl = document.getElementById(`classification-${id}`);
-            classEl.innerText = data.classification;
-            classEl.className = 'cipher cipher-pill';
+            classEl.innerText = data.classification; classEl.className = 'cipher cipher-pill';
 
             const emailEl = document.getElementById(`email-${id}`);
-            emailEl.innerText = data.email;
-            emailEl.className = 'cipher cipher-pill';
+            emailEl.innerText = data.email; emailEl.className = 'cipher cipher-pill';
 
             const rateEl = document.getElementById(`rate-${id}`);
-            rateEl.innerText = data.rating;
-            rateEl.className = 'cipher cipher-pill';
-            rateEl.style.color = '';
-            rateEl.style.borderBottom = '';
-            rateEl.style.fontSize = '';
+            rateEl.innerText = data.rating; rateEl.className = 'cipher cipher-pill';
+            rateEl.style.color = ''; rateEl.style.borderBottom = '';
             
             const msgContainer = document.getElementById(`msg-container-${id}`);
             msgContainer.className = 'cipher cipher-block'; 
@@ -424,7 +336,7 @@
         }
 
         async function del(id) {
-            if (!confirm("Are you sure you want to permanently delete this record?")) return;
+            if (!confirm("Are you sure?")) return;
             const res = await fetch(`/api/admin/feedback/${id}`, { 
                 method: 'DELETE', 
                 headers: {'Authorization': localStorage.getItem('adminToken')} 
