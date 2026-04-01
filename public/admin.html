@@ -29,7 +29,6 @@
             line-height: 1.6;
         }
 
-        /* --- NEW: Back Link Styling --- */
         .back-link {
             display: inline-flex;
             align-items: center;
@@ -43,25 +42,21 @@
         }
         .back-link:hover {
             color: var(--ua-blue);
-            transform: translateX(-3px); /* Small slide effect */
+            transform: translateX(-3px); 
         }
-        /* ------------------------------ */
 
         /* Header Styling */
-        /* Adjusted Header for Side-by-Side Layout */
         .portal-header {
             display: flex;
-            align-items: center;      /* Vertically centers the logo and text */
-            justify-content: center;  /* Centers the entire block on the page */
-            gap: 25px;                /* Perfect spacing between logo and text */
+            align-items: center;      
+            justify-content: center;  
+            gap: 25px;                
             margin-bottom: 30px; 
             padding-bottom: 25px; 
             border-bottom: 1px solid var(--cit-grey-light);
         }
         
-        .header-titles {
-            text-align: left;         /* Left-aligns the text next to the logo */
-        }
+        .header-titles { text-align: left; }
 
         .portal-header h1 { 
             color: var(--ua-blue); 
@@ -88,7 +83,6 @@
             flex-shrink: 0;           
         }
 
-        /* Tighter Login Section Alignment */
         #loginSection { 
             background: var(--card-bg); 
             padding: 40px; 
@@ -103,7 +97,6 @@
         }
         #loginSection h2 { margin-top: 0; color: var(--ua-blue); }
 
-        /* Dashboard & Header Layout */
         .dashboard-header {
             display: flex; 
             justify-content: space-between; 
@@ -119,7 +112,6 @@
             gap: 10px;
         }
 
-        /* Dashboard Cards */
         .card { 
             background: var(--card-bg); 
             border-left: 8px solid var(--ua-blue); 
@@ -134,7 +126,6 @@
             box-shadow: 0 12px 25px rgba(0, 71, 133, 0.08);
         }
 
-        /* Inputs & Buttons */
         input { 
             padding: 14px 16px; 
             margin: 10px 0; 
@@ -177,8 +168,6 @@
         .btn-secondary:hover { background: #64748b; }
 
         /* --- DATA DISPLAY STATES --- */
-        
-        /* 1. Encrypted State (Cipher) */
         .cipher { 
             font-family: 'Courier New', Consolas, monospace; 
             color: #475569; 
@@ -200,7 +189,6 @@
             letter-spacing: 0.5px;
         }
 
-        /* 2. Decrypted State (Clean & Readable) */
         .decrypted-inline { 
             color: var(--ua-blue); 
             font-family: 'Inter', system-ui, sans-serif; 
@@ -226,7 +214,6 @@
             transition: all 0.3s ease;
         }
 
-        /* Layout for Data Rows */
         .data-row {
             display: flex;
             align-items: center;
@@ -261,6 +248,7 @@
     <a href="/" class="back-link">
         <span>←</span> Back to Gateway
     </a>
+
     <div class="portal-header">
         <img src="ua-logo.png" alt="University of the Assumption Logo" class="ua-logo">
         <div class="header-titles">
@@ -316,10 +304,16 @@
             const list = document.getElementById('list');
             list.innerHTML = feedbacks.map(f => `
                 <div class="card" id="card-${f.id}">
+                    
                     <div class="data-row">
                         <span class="label-strong">🔐 Name / Class:</span> 
                         <span class="cipher cipher-pill" id="name-${f.id}">${f.encName}</span>
                         <span class="cipher cipher-pill" id="classification-${f.id}">${f.encClassification}</span>
+                    </div>
+
+                    <div class="data-row">
+                        <span class="label-strong">🔐 Email Address:</span> 
+                        <span class="cipher cipher-pill" id="email-${f.id}">${f.encEmail}</span>
                     </div>
                     
                     <div class="data-row">
@@ -352,6 +346,7 @@
             cipherStorage[id] = {
                 name: document.getElementById(`name-${id}`).innerText,
                 classification: document.getElementById(`classification-${id}`).innerText,
+                email: document.getElementById(`email-${id}`).innerText, // Grab email cipher
                 rating: document.getElementById(`rate-${id}`).innerText,
                 msg: document.getElementById(`msg-${id}`).innerText
             };
@@ -363,7 +358,7 @@
                 });
                 const d = await res.json();
 
-                // Swap to Decrypted Inline Styles
+                // Swap Name & Classification
                 const nameEl = document.getElementById(`name-${id}`);
                 nameEl.innerText = d.name;
                 nameEl.className = 'decrypted-inline';
@@ -371,6 +366,11 @@
                 const classEl = document.getElementById(`classification-${id}`);
                 classEl.innerText = d.classification;
                 classEl.className = 'decrypted-inline';
+
+                // Swap NEW Email Field
+                const emailEl = document.getElementById(`email-${id}`);
+                emailEl.innerText = d.email;
+                emailEl.className = 'decrypted-inline';
 
                 // Handle Rating Stars
                 const rateEl = document.getElementById(`rate-${id}`);
@@ -380,7 +380,7 @@
                 rateEl.style.borderBottom = 'none';
                 rateEl.style.fontSize = '1.2em';
                 
-                // Swap to Decrypted Block Style
+                // Swap Message Block
                 const msgContainer = document.getElementById(`msg-container-${id}`);
                 msgContainer.className = 'decrypted-block';
                 document.getElementById(`msg-${id}`).innerText = d.message;
@@ -398,7 +398,7 @@
             const btn = document.getElementById(`btn-${id}`);
             const data = cipherStorage[id];
 
-            // Revert to Cipher Pill Styles
+            // Revert Name & Classification
             const nameEl = document.getElementById(`name-${id}`);
             nameEl.innerText = data.name;
             nameEl.className = 'cipher cipher-pill';
@@ -407,6 +407,12 @@
             classEl.innerText = data.classification;
             classEl.className = 'cipher cipher-pill';
 
+            // Revert NEW Email Field
+            const emailEl = document.getElementById(`email-${id}`);
+            emailEl.innerText = data.email;
+            emailEl.className = 'cipher cipher-pill';
+
+            // Revert Rating Field
             const rateEl = document.getElementById(`rate-${id}`);
             rateEl.innerText = data.rating;
             rateEl.className = 'cipher cipher-pill';
@@ -414,7 +420,7 @@
             rateEl.style.borderBottom = '';
             rateEl.style.fontSize = '';
             
-            // Revert to Cipher Block Style
+            // Revert Message Block
             const msgContainer = document.getElementById(`msg-container-${id}`);
             msgContainer.className = 'cipher cipher-block'; 
             document.getElementById(`msg-${id}`).innerText = data.msg;
