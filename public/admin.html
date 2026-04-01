@@ -245,7 +245,7 @@
 </head>
 <body>
 
-    <a href="/" class="back-link">
+    <a href="/" class="back-link" id="gatewayBtn">
         <span>←</span> Back to Gateway
     </a>
 
@@ -296,6 +296,9 @@
             document.getElementById('loginSection').style.display = 'none';
             document.getElementById('dashboard').style.display = 'block';
             
+            // NEW: Hide the "Back to Gateway" button when showing the dashboard
+            document.getElementById('gatewayBtn').style.display = 'none';
+            
             const res = await fetch('/api/admin/feedbacks', { 
                 headers: {'Authorization': localStorage.getItem('adminToken')} 
             });
@@ -342,11 +345,10 @@
             const token = localStorage.getItem('adminToken');
             const btn = document.getElementById(`btn-${id}`);
             
-            // Store original cipher data
             cipherStorage[id] = {
                 name: document.getElementById(`name-${id}`).innerText,
                 classification: document.getElementById(`classification-${id}`).innerText,
-                email: document.getElementById(`email-${id}`).innerText, // Grab email cipher
+                email: document.getElementById(`email-${id}`).innerText, 
                 rating: document.getElementById(`rate-${id}`).innerText,
                 msg: document.getElementById(`msg-${id}`).innerText
             };
@@ -358,7 +360,6 @@
                 });
                 const d = await res.json();
 
-                // Swap Name & Classification
                 const nameEl = document.getElementById(`name-${id}`);
                 nameEl.innerText = d.name;
                 nameEl.className = 'decrypted-inline';
@@ -367,12 +368,10 @@
                 classEl.innerText = d.classification;
                 classEl.className = 'decrypted-inline';
 
-                // Swap NEW Email Field
                 const emailEl = document.getElementById(`email-${id}`);
                 emailEl.innerText = d.email;
                 emailEl.className = 'decrypted-inline';
 
-                // Handle Rating Stars
                 const rateEl = document.getElementById(`rate-${id}`);
                 rateEl.innerText = '★'.repeat(d.rating);
                 rateEl.className = 'decrypted-inline';
@@ -380,12 +379,10 @@
                 rateEl.style.borderBottom = 'none';
                 rateEl.style.fontSize = '1.2em';
                 
-                // Swap Message Block
                 const msgContainer = document.getElementById(`msg-container-${id}`);
                 msgContainer.className = 'decrypted-block';
                 document.getElementById(`msg-${id}`).innerText = d.message;
 
-                // Update Button
                 btn.innerText = "🔒 Encrypt Back";
                 btn.className = "btn-secondary";
                 btn.onclick = () => encryptBack(id);
@@ -398,7 +395,6 @@
             const btn = document.getElementById(`btn-${id}`);
             const data = cipherStorage[id];
 
-            // Revert Name & Classification
             const nameEl = document.getElementById(`name-${id}`);
             nameEl.innerText = data.name;
             nameEl.className = 'cipher cipher-pill';
@@ -407,12 +403,10 @@
             classEl.innerText = data.classification;
             classEl.className = 'cipher cipher-pill';
 
-            // Revert NEW Email Field
             const emailEl = document.getElementById(`email-${id}`);
             emailEl.innerText = data.email;
             emailEl.className = 'cipher cipher-pill';
 
-            // Revert Rating Field
             const rateEl = document.getElementById(`rate-${id}`);
             rateEl.innerText = data.rating;
             rateEl.className = 'cipher cipher-pill';
@@ -420,12 +414,10 @@
             rateEl.style.borderBottom = '';
             rateEl.style.fontSize = '';
             
-            // Revert Message Block
             const msgContainer = document.getElementById(`msg-container-${id}`);
             msgContainer.className = 'cipher cipher-block'; 
             document.getElementById(`msg-${id}`).innerText = data.msg;
 
-            // Update Button
             btn.innerText = "🔓 Decrypt Data";
             btn.className = "btn-primary";
             btn.onclick = () => decryptItem(id);
