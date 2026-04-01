@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UA-CIT API Gateway</title>
+    <style>
+        :root {
+            --ua-blue: #003b6f;
+            --ua-blue-hover: #0056a3;
+            --bg-color: #f0f4f8;
+            --card-bg: #ffffff;
+            --status-green: #10b981;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: #334155;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .gateway-card {
+            background: var(--card-bg);
+            padding: 50px 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            border-top: 6px solid var(--ua-blue);
+            text-align: center;
+            max-width: 450px;
+            width: 100%;
+        }
+
+        .logo-placeholder {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            color: var(--ua-blue);
+            margin: 0 0 10px 0;
+            font-size: 1.6em;
+            font-weight: 800;
+        }
+
+        p {
+            color: #64748b;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        /* Pulsing Status Dot */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #ecfdf5;
+            color: #047857;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9em;
+            margin-bottom: 30px;
+            border: 1px solid #a7f3d0;
+        }
+
+        .pulse-dot {
+            width: 10px;
+            height: 10px;
+            background-color: var(--status-green);
+            border-radius: 50%;
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        .btn-portal {
+            display: inline-block;
+            background: var(--ua-blue);
+            color: white;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: background 0.2s, transform 0.1s;
+            width: 80%;
+            box-sizing: border-box;
+        }
+
+        .btn-portal:hover {
+            background: var(--ua-blue-hover);
+        }
+
+        .btn-portal:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="gateway-card">
+        <div class="logo-placeholder">🛡️</div>
+        <h1>UA-CIT Office Feedback Survey Backend</h1>
+        <p>This is the encrypted backend engine for the College of Information Technology Feedback Survey System.</p>
+        
+        <div class="status-badge">
+            <div class="pulse-dot"></div>
+            API Routing System: ONLINE
+        </div>
+
+        <a href="/admin.html" class="btn-portal">Access Admin Portal</a>
+    </div>
+
+</body>
+</html>
