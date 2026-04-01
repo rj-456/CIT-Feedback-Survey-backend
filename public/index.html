@@ -8,6 +8,7 @@
         :root {
             --ua-blue: #003b6f;
             --ua-blue-hover: #0056a3;
+            --cit-grey: #64748b;
             --bg-color: #f0f4f8;
             --card-bg: #ffffff;
             --status-green: #10b981;
@@ -18,12 +19,39 @@
             background-color: var(--bg-color);
             color: #334155;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
         }
 
+        /* UA-CIT Unified Header */
+        .portal-header {
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 40px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+            width: 100%;
+            max-width: 900px;
+        }
+        .portal-header h1 { 
+            color: var(--ua-blue); 
+            margin: 0; 
+            font-size: 2em; 
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+        .portal-header h2 { 
+            color: var(--cit-grey); 
+            margin: 5px 0 0 0; 
+            font-size: 1.2em; 
+            font-weight: 500; 
+        }
+
+        /* Gateway Card */
         .gateway-card {
             background: var(--card-bg);
             padding: 50px 40px;
@@ -33,6 +61,7 @@
             text-align: center;
             max-width: 450px;
             width: 100%;
+            margin-top: 2vh; /* Balances the card in the middle of the remaining space */
         }
 
         .logo-placeholder {
@@ -40,7 +69,7 @@
             margin-bottom: 10px;
         }
 
-        h1 {
+        .gateway-card h3 {
             color: var(--ua-blue);
             margin: 0 0 10px 0;
             font-size: 1.6em;
@@ -107,11 +136,16 @@
 </head>
 <body>
 
+    <div class="portal-header">
+        <h1>University of the Assumption</h1>
+        <h2>College of Information Technology Office Feedback Survey Backend</h2>
+    </div>
+
     <div class="gateway-card">
         <div class="logo-placeholder">🛡️</div>
-        <h1>UA-CIT Office Feedback Survey Backend</h1>
-        <p>This is the encrypted backend engine for the College of Information Technology Feedback Survey System.</p>
-        
+        <h3>Secure API Engine</h3>
+        <p>This is the encrypted backend engine for the College of Information Technology Office Feedback Survey System.</p>
+
         <div class="status-badge">
             <div class="pulse-dot"></div>
             API Routing System: ONLINE
