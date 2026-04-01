@@ -6,30 +6,30 @@
     <style>
         /* Premium UA & CIT Color Palette */
         :root {
-            --ua-blue: #003b6f;         
-            --ua-blue-hover: #0056a3;   
-            --cit-grey: #64748b;        
-            --bg-color: #f0f4f8;        
-            --card-bg: #ffffff;
-            --cipher-bg: #0f172a;       
+            --ua-blue: #004785;         
+            --ua-blue-hover: #003366;   
+            --cit-grey: #8a9aa9;        
+            --cit-grey-light: #e2e8f0;  
+            --bg-color: #f4f7f9;        
+            --card-bg: #ffffff;         
+            --cipher-bg: #111827;       
             --cipher-text: #38bdf8;     
-            --decrypted-bg: #f0f9ff;    
-            --decrypted-text: #0c4a6e;  
             --danger: #ef4444;          
             --danger-hover: #dc2626;
+            --warning-gold: #eab308;    
         }
 
         body { 
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
-            padding: 20px; 
-            max-width: 900px; 
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            padding: 40px 20px; 
+            max-width: 950px; 
             margin: auto; 
             background-color: var(--bg-color); 
             color: #334155; 
-            line-height: 1.5;
+            line-height: 1.6;
         }
 
-        /* NEW: Back Link Styling */
+        /* --- NEW: Back Link Styling --- */
         .back-link {
             display: inline-flex;
             align-items: center;
@@ -38,43 +38,64 @@
             text-decoration: none;
             font-weight: 600;
             font-size: 0.95em;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
             transition: color 0.2s ease, transform 0.2s ease;
         }
         .back-link:hover {
             color: var(--ua-blue);
             transform: translateX(-3px); /* Small slide effect */
         }
+        /* ------------------------------ */
 
         /* Header Styling */
+        /* Adjusted Header for Side-by-Side Layout */
         .portal-header {
-            text-align: center;
-            margin-bottom: 40px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            align-items: center;      /* Vertically centers the logo and text */
+            justify-content: center;  /* Centers the entire block on the page */
+            gap: 25px;                /* Perfect spacing between logo and text */
+            margin-bottom: 30px; 
+            padding-bottom: 25px; 
+            border-bottom: 1px solid var(--cit-grey-light);
         }
+        
+        .header-titles {
+            text-align: left;         /* Left-aligns the text next to the logo */
+        }
+
         .portal-header h1 { 
             color: var(--ua-blue); 
-            margin: 0; 
-            font-size: 2em; 
+            margin: 0 0 4px 0; 
+            font-size: 2.2em; 
             font-weight: 800;
             letter-spacing: -0.5px;
         }
+        
         .portal-header h2 { 
             color: var(--cit-grey); 
-            margin: 5px 0 0 0; 
-            font-size: 1.2em; 
+            margin: 0; 
+            font-size: 1.15em; 
             font-weight: 500; 
         }
 
-        /* Login Section */
+        .ua-logo {
+            width: 105px;            
+            height: auto;
+            margin: 0;            
+            border-radius: 50%; 
+            mix-blend-mode: multiply; 
+            filter: drop-shadow(0 4px 8px rgba(0, 71, 133, 0.1)); 
+            flex-shrink: 0;           
+        }
+
+        /* Tighter Login Section Alignment */
         #loginSection { 
             background: var(--card-bg); 
             padding: 40px; 
             border-radius: 12px; 
             text-align: center; 
-            margin-top: 40px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
+            margin-top: 30px; 
+            box-shadow: 0 10px 30px rgba(0, 71, 133, 0.08); 
             border-top: 6px solid var(--ua-blue); 
             max-width: 400px;
             margin-left: auto;
@@ -82,29 +103,45 @@
         }
         #loginSection h2 { margin-top: 0; color: var(--ua-blue); }
 
+        /* Dashboard & Header Layout */
+        .dashboard-header {
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 30px;
+        }
+        .dashboard-header h3 {
+            color: var(--ua-blue); 
+            margin: 0; 
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
         /* Dashboard Cards */
         .card { 
             background: var(--card-bg); 
-            border-left: 6px solid var(--ua-blue); 
-            padding: 25px; 
-            margin-bottom: 25px; 
-            border-radius: 10px; 
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            border-left: 8px solid var(--ua-blue); 
+            padding: 30px; 
+            margin-bottom: 30px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
         .card:hover { 
             transform: translateY(-2px); 
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 12px 25px rgba(0, 71, 133, 0.08);
         }
 
         /* Inputs & Buttons */
         input { 
-            padding: 12px 15px; 
+            padding: 14px 16px; 
             margin: 10px 0; 
             width: 100%; 
             box-sizing: border-box; 
             border-radius: 8px; 
-            border: 1px solid #cbd5e1; 
+            border: 1px solid var(--cit-grey-light); 
             background: #f8fafc; 
             color: #334155; 
             font-size: 1em;
@@ -113,95 +150,136 @@
         input:focus { 
             outline: none; 
             border-color: var(--ua-blue); 
-            box-shadow: 0 0 0 3px rgba(0,59,111,0.1); 
-            background: #fff;
+            box-shadow: 0 0 0 4px rgba(0, 71, 133, 0.1); 
+            background: var(--card-bg);
         }
 
         button { 
             padding: 10px 20px; 
-            border-radius: 6px; 
+            border-radius: 8px; 
             border: none; 
             cursor: pointer; 
             font-weight: 600; 
             font-size: 0.95em;
-            transition: background 0.2s, transform 0.1s; 
+            transition: all 0.2s ease; 
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            justify-content: center;
+            gap: 8px;
         }
         button:active { transform: scale(0.97); }
 
-        .btn-primary { background: var(--ua-blue); color: #fff; }
-        .btn-primary:hover { background: var(--ua-blue-hover); }
+        .btn-primary { background: var(--ua-blue); color: var(--card-bg); box-shadow: 0 4px 6px rgba(0, 71, 133, 0.2); }
+        .btn-primary:hover { background: var(--ua-blue-hover); box-shadow: 0 6px 12px rgba(0, 71, 133, 0.3); }
+        .btn-danger { background: var(--danger); color: var(--card-bg); box-shadow: 0 4px 6px rgba(239, 68, 68, 0.2); }
+        .btn-danger:hover { background: var(--danger-hover); box-shadow: 0 6px 12px rgba(239, 68, 68, 0.3); }
+        .btn-secondary { background: var(--cit-grey); color: var(--card-bg); }
+        .btn-secondary:hover { background: #64748b; }
+
+        /* --- DATA DISPLAY STATES --- */
         
-        .btn-danger { background: var(--danger); color: #fff; }
-        .btn-danger:hover { background: var(--danger-hover); }
-
-        .btn-secondary { background: var(--cit-grey); color: #fff; }
-        .btn-secondary:hover { background: #475569; }
-
-        /* Secure Data Badges (Ciphertext) */
+        /* 1. Encrypted State (Cipher) */
         .cipher { 
             font-family: 'Courier New', Consolas, monospace; 
-            color: var(--cipher-text); 
-            background: var(--cipher-bg); 
-            padding: 6px 12px; 
-            border-radius: 6px; 
-            word-break: break-all; 
-            font-size: 0.85em; 
+            color: #475569; 
+            background: #f8fafc; 
+            border: 1px dashed var(--cit-grey); 
+        }
+        .cipher-pill {
+            padding: 6px 16px; 
+            border-radius: 20px; 
+            font-size: 0.9em; 
             display: inline-block;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+            letter-spacing: 0.5px;
+        }
+        .cipher-block {
+            display: block; 
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 0.95em;
             letter-spacing: 0.5px;
         }
 
-        /* Revealed Decrypted Text */
-        .decrypted { 
-            background: var(--decrypted-bg); 
-            color: var(--decrypted-text); 
-            padding: 15px 20px; 
-            border-radius: 8px; 
-            margin-top: 10px; 
-            border-left: 4px solid var(--ua-blue); 
-            font-family: 'Segoe UI', system-ui, sans-serif; 
-            font-weight: 500;
+        /* 2. Decrypted State (Clean & Readable) */
+        .decrypted-inline { 
+            color: var(--ua-blue); 
+            font-family: 'Inter', system-ui, sans-serif; 
+            font-weight: 700;
+            font-size: 1.05em;
+            background: transparent;
+            padding: 4px 8px;
+            border-bottom: 2px solid var(--cit-grey-light);
+            display: inline-block;
+            transition: all 0.3s ease;
         }
-        
+        .decrypted-block { 
+            background: #f8fafc; 
+            color: #334155; 
+            padding: 18px 20px; 
+            border-radius: 0 8px 8px 0; 
+            border-left: 4px solid var(--ua-blue); 
+            font-family: 'Inter', system-ui, sans-serif; 
+            font-weight: 400;
+            font-size: 1em;
+            line-height: 1.6;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            transition: all 0.3s ease;
+        }
+
+        /* Layout for Data Rows */
         .data-row {
             display: flex;
-            align-items: baseline;
-            gap: 10px;
-            margin-bottom: 12px;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 18px;
             flex-wrap: wrap;
         }
         .label-strong { 
             color: var(--ua-blue); 
             font-weight: 700; 
-            min-width: 160px;
+            min-width: 180px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.05em;
+        }
+        .message-container {
+            margin-bottom: 25px;
+            margin-top: 10px;
+        }
+        .action-bar {
+            display: flex; 
+            gap: 15px; 
+            border-top: 1px solid var(--cit-grey-light); 
+            padding-top: 20px;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
-    
-    <a href="/" class="back-link">
-        <span>←</span> Back to the Gateway
-    </a>
 
+    <a href="/" class="back-link">
+        <span>←</span> Back to Gateway
+    </a>
     <div class="portal-header">
-        <h1>University of the Assumption</h1>
-        <h2>College of Information Technology Office Feedback Survey Backend</h2>
+        <img src="ua-logo.png" alt="University of the Assumption Logo" class="ua-logo">
+        <div class="header-titles">
+            <h1>University of the Assumption</h1>
+            <h2>College of Information Technology Office Feedback Survey</h2>
+        </div>
     </div>
 
     <div id="loginSection">
         <h2 style="margin-bottom: 25px;">🛡️ Secure Admin Portal</h2>
         <input type="text" id="user" placeholder="Admin Username">
         <input type="password" id="pass" placeholder="Password">
-        <button class="btn-primary" onclick="login()" style="width: 100%; justify-content: center; margin-top: 20px; padding: 12px; font-size: 1.1em;">Authenticate Session</button>
+        <button class="btn-primary" onclick="login()" style="width: 100%; margin-top: 20px; padding: 14px; font-size: 1.1em;">Authenticate Login</button>
     </div>
 
     <div id="dashboard" style="display:none;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-            <h3 style="color: var(--ua-blue); margin: 0; font-size: 1.4em;">🔐 Encrypted Feedback Vault</h3>
-            <button class="btn-danger" onclick="localStorage.clear(); location.reload();">Log Out</button>
+        <div class="dashboard-header">
+            <h3><span style="font-size: 1.2em;">🔐</span> Encrypted Feedback Vault</h3>
+            <button class="btn-danger" onclick="localStorage.clear(); location.reload();" style="padding: 12px 24px;">Log Out</button>
         </div>
         <div id="list"></div>
     </div>
@@ -239,26 +317,26 @@
             list.innerHTML = feedbacks.map(f => `
                 <div class="card" id="card-${f.id}">
                     <div class="data-row">
-                        <span class="label-strong">🔒 Name / Class:</span> 
-                        <span class="cipher" id="name-${f.id}">${f.encName}</span>
-                        <span class="cipher" id="classification-${f.id}">${f.encClassification}</span>
+                        <span class="label-strong">🔐 Name / Class:</span> 
+                        <span class="cipher cipher-pill" id="name-${f.id}">${f.encName}</span>
+                        <span class="cipher cipher-pill" id="classification-${f.id}">${f.encClassification}</span>
                     </div>
                     
                     <div class="data-row">
-                        <span class="label-strong">🔒 Rating:</span> 
-                        <span class="cipher" id="rate-${f.id}">${f.encRating}</span>
+                        <span class="label-strong">🔐 Rating:</span> 
+                        <span class="cipher cipher-pill" id="rate-${f.id}">${f.encRating}</span>
                     </div>
                     
-                    <div class="data-row" style="margin-top: 15px;">
-                        <span class="label-strong">🔒 Message:</span>
+                    <div class="data-row" style="margin-bottom: 5px;">
+                        <span class="label-strong">🔐 Message:</span>
                     </div>
-                    <div style="margin-bottom: 20px;">
-                        <div class="cipher" id="msg-container-${f.id}" style="display: block; padding: 12px;">
+                    <div class="message-container">
+                        <div class="cipher cipher-block" id="msg-container-${f.id}">
                             <span id="msg-${f.id}">${f.encMsg}</span>
                         </div>
                     </div>
 
-                    <div style="display: flex; gap: 12px; border-top: 1px solid #f1f5f9; padding-top: 15px;">
+                    <div class="action-bar">
                         <button class="btn-primary" onclick="decryptItem('${f.id}')" id="btn-${f.id}">🔓 Decrypt Data</button>
                         <button class="btn-danger" onclick="del('${f.id}')">🗑️ Delete Record</button>
                     </div>
@@ -270,6 +348,7 @@
             const token = localStorage.getItem('adminToken');
             const btn = document.getElementById(`btn-${id}`);
             
+            // Store original cipher data
             cipherStorage[id] = {
                 name: document.getElementById(`name-${id}`).innerText,
                 classification: document.getElementById(`classification-${id}`).innerText,
@@ -284,30 +363,29 @@
                 });
                 const d = await res.json();
 
-                document.getElementById(`name-${id}`).innerText = d.name;
-                document.getElementById(`name-${id}`).className = 'decrypted';
-                document.getElementById(`name-${id}`).style.display = 'inline-block';
-                document.getElementById(`name-${id}`).style.padding = '4px 12px';
-                document.getElementById(`name-${id}`).style.marginTop = '0';
+                // Swap to Decrypted Inline Styles
+                const nameEl = document.getElementById(`name-${id}`);
+                nameEl.innerText = d.name;
+                nameEl.className = 'decrypted-inline';
 
-                document.getElementById(`classification-${id}`).innerText = d.classification;
-                document.getElementById(`classification-${id}`).className = 'decrypted';
-                document.getElementById(`classification-${id}`).style.display = 'inline-block';
-                document.getElementById(`classification-${id}`).style.padding = '4px 12px';
-                document.getElementById(`classification-${id}`).style.marginTop = '0';
+                const classEl = document.getElementById(`classification-${id}`);
+                classEl.innerText = d.classification;
+                classEl.className = 'decrypted-inline';
 
-                document.getElementById(`rate-${id}`).innerText = '★'.repeat(d.rating);
-                document.getElementById(`rate-${id}`).className = 'decrypted';
-                document.getElementById(`rate-${id}`).style.display = 'inline-block';
-                document.getElementById(`rate-${id}`).style.padding = '4px 12px';
-                document.getElementById(`rate-${id}`).style.marginTop = '0';
+                // Handle Rating Stars
+                const rateEl = document.getElementById(`rate-${id}`);
+                rateEl.innerText = '★'.repeat(d.rating);
+                rateEl.className = 'decrypted-inline';
+                rateEl.style.color = 'var(--warning-gold)';
+                rateEl.style.borderBottom = 'none';
+                rateEl.style.fontSize = '1.2em';
                 
-                const msgSpan = document.getElementById(`msg-${id}`);
+                // Swap to Decrypted Block Style
                 const msgContainer = document.getElementById(`msg-container-${id}`);
-                msgContainer.className = 'decrypted';
-                msgContainer.style.boxShadow = 'none';
-                msgSpan.innerText = d.message;
+                msgContainer.className = 'decrypted-block';
+                document.getElementById(`msg-${id}`).innerText = d.message;
 
+                // Update Button
                 btn.innerText = "🔒 Encrypt Back";
                 btn.className = "btn-secondary";
                 btn.onclick = () => encryptBack(id);
@@ -320,28 +398,28 @@
             const btn = document.getElementById(`btn-${id}`);
             const data = cipherStorage[id];
 
+            // Revert to Cipher Pill Styles
             const nameEl = document.getElementById(`name-${id}`);
             nameEl.innerText = data.name;
-            nameEl.className = 'cipher';
-            nameEl.style = '';
+            nameEl.className = 'cipher cipher-pill';
 
             const classEl = document.getElementById(`classification-${id}`);
             classEl.innerText = data.classification;
-            classEl.className = 'cipher';
-            classEl.style = '';
+            classEl.className = 'cipher cipher-pill';
 
             const rateEl = document.getElementById(`rate-${id}`);
             rateEl.innerText = data.rating;
-            rateEl.className = 'cipher';
-            rateEl.style = '';
+            rateEl.className = 'cipher cipher-pill';
+            rateEl.style.color = '';
+            rateEl.style.borderBottom = '';
+            rateEl.style.fontSize = '';
             
-            const msgSpan = document.getElementById(`msg-${id}`);
+            // Revert to Cipher Block Style
             const msgContainer = document.getElementById(`msg-container-${id}`);
-            msgContainer.className = 'cipher'; 
-            msgContainer.style.display = 'block';
-            msgContainer.style.padding = '12px';
-            msgSpan.innerText = data.msg;
+            msgContainer.className = 'cipher cipher-block'; 
+            document.getElementById(`msg-${id}`).innerText = data.msg;
 
+            // Update Button
             btn.innerText = "🔓 Decrypt Data";
             btn.className = "btn-primary";
             btn.onclick = () => decryptItem(id);

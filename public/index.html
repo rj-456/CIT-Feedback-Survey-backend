@@ -5,17 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UA-CIT Office Feedback Survey Backend</title>
     <style>
+        /* Synced with Premium UA & CIT Color Palette */
         :root {
-            --ua-blue: #003b6f;
-            --ua-blue-hover: #0056a3;
-            --cit-grey: #64748b;
-            --bg-color: #f0f4f8;
-            --card-bg: #ffffff;
+            --ua-blue: #004785;         
+            --ua-blue-hover: #003366;   
+            --cit-grey: #8a9aa9;        
+            --cit-grey-light: #e2e8f0;  
+            --bg-color: #f4f7f9;        
+            --card-bg: #ffffff;         
             --status-green: #10b981;
         }
 
         body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; 
             background-color: var(--bg-color);
             color: #334155;
             display: flex;
@@ -27,28 +29,47 @@
             box-sizing: border-box;
         }
 
-        /* UA-CIT Unified Header */
+        /* Adjusted Header for Side-by-Side Layout */
         .portal-header {
-            text-align: center;
+            display: flex;
+            align-items: center;      
+            justify-content: center;  
+            gap: 25px;                
             margin-top: 20px;
-            margin-bottom: 40px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 40px; 
+            padding-bottom: 25px; 
+            border-bottom: 1px solid var(--cit-grey-light);
             width: 100%;
             max-width: 900px;
         }
+        
+        .header-titles {
+            text-align: left;         
+        }
+
         .portal-header h1 { 
             color: var(--ua-blue); 
-            margin: 0; 
-            font-size: 2em; 
+            margin: 0 0 4px 0; 
+            font-size: 2.2em; 
             font-weight: 800;
             letter-spacing: -0.5px;
         }
+        
         .portal-header h2 { 
             color: var(--cit-grey); 
-            margin: 5px 0 0 0; 
-            font-size: 1.2em; 
+            margin: 0; 
+            font-size: 1.15em; 
             font-weight: 500; 
+        }
+
+        .ua-logo {
+            width: 105px;            
+            height: auto;
+            margin: 0;            
+            border-radius: 50%; 
+            mix-blend-mode: multiply; 
+            filter: drop-shadow(0 4px 8px rgba(0, 71, 133, 0.1)); 
+            flex-shrink: 0;           
         }
 
         /* Gateway Card */
@@ -56,12 +77,12 @@
             background: var(--card-bg);
             padding: 50px 40px;
             border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            box-shadow: 0 10px 30px rgba(0, 71, 133, 0.08); 
             border-top: 6px solid var(--ua-blue);
             text-align: center;
             max-width: 450px;
             width: 100%;
-            margin-top: 2vh; /* Balances the card in the middle of the remaining space */
+            margin-top: 2vh; 
         }
 
         .logo-placeholder {
@@ -118,27 +139,32 @@
             color: white;
             text-decoration: none;
             padding: 12px 24px;
-            border-radius: 6px;
+            border-radius: 8px;
             font-weight: 600;
-            transition: background 0.2s, transform 0.1s;
+            transition: all 0.2s ease;
             width: 80%;
             box-sizing: border-box;
+            box-shadow: 0 4px 6px rgba(0, 71, 133, 0.2);
         }
 
         .btn-portal:hover {
             background: var(--ua-blue-hover);
+            box-shadow: 0 6px 12px rgba(0, 71, 133, 0.3);
         }
 
         .btn-portal:active {
-            transform: scale(0.98);
+            transform: scale(0.97);
         }
     </style>
 </head>
 <body>
 
     <div class="portal-header">
-        <h1>University of the Assumption</h1>
-        <h2>College of Information Technology Office Feedback Survey Backend</h2>
+        <img src="ua-logo.png" alt="University of the Assumption Logo" class="ua-logo">
+        <div class="header-titles">
+            <h1>University of the Assumption</h1>
+            <h2>College of Information Technology Office Feedback Survey Backend</h2>
+        </div>
     </div>
 
     <div class="gateway-card">
