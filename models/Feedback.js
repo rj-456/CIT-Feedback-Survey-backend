@@ -1,25 +1,26 @@
 const mongoose = require('mongoose');
 
 const feedbackSchema = new mongoose.Schema({
-    // Encrypted Identification
-    classification: { type: String, required: true }, 
-    classificationIv: { type: String, required: true },
-    
-    // Made optional
-    name: { type: String, required: false }, 
-    nameIv: { type: String, required: false },
-    
-    // Encrypted Data
-    rating: { type: String, required: true }, 
-    ratingIv: { type: String, required: true },
-    
-    // Made optional
-    encryptedEmail: { type: String, required: false },
-    emailIv: { type: String, required: false },
-    
-    encryptedFeedback: { type: String, required: true },
-    feedbackIv: { type: String, required: true },
-    
+    classification: {
+        c1: { type: String, required: true },
+        c2: { type: String, required: true }
+    },
+    name: {
+        c1: { type: String, required: false, default: '' },
+        c2: { type: String, required: false, default: '' }
+    },
+    rating: {
+        c1: { type: String, required: true },
+        c2: { type: String, required: true }
+    },
+    encryptedEmail: {
+        c1: { type: String, required: false, default: '' },
+        c2: { type: String, required: false, default: '' }
+    },
+    encryptedFeedback: {
+        c1: { type: String, required: true },
+        c2: { type: String, required: true }
+    },
     createdAt: { type: Date, default: Date.now }
 });
 

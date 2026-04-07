@@ -1,177 +1,160 @@
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
-const crypto = require('crypto'); // Node.js built-in library for cryptographic functions
-const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const cors = require('cors');
 const Feedback = require('./models/Feedback');
 
 const app = express();
+app.use(cors());
 app.use(express.json());
-app.use(cors({ origin: '*' }));
 app.use(express.static('public'));
 
-/* =========================================================================
-   CRYPTOGRAPHY SETUP: AES-256-CBC
-   =========================================================================
-   AES (Advanced Encryption Standard) is a symmetric encryption algorithm.
-   - '256' means it uses a 256-bit (32-byte) key, providing military-grade security.
-   - 'cbc' (Cipher Block Chaining) is a mode of operation where each block of 
-     plaintext is XORed with the previous ciphertext block before being encrypted. 
-     This requires an Initialization Vector (IV) to start the chain.
-========================================================================= */
-const ALGORITHM = 'aes-256-cbc';
+// ─── MongoDB Connection ───────────────────────────────────────────────────────
+mongoose.connect(process.env.MONGODB_URI)
+    .then(() => console.log('✅ MongoDB Connected'))
+    .catch(err => console.error('❌ MongoDB Error:', err));
 
-// The master key is loaded from the hidden .env file.
-// For AES-256, this key MUST be exactly 32 bytes (256 bits) long.
-const AES_KEY = Buffer.from(process.env.AES_KEY, 'utf8');
+// ─── ElGamal Key Setup ────────────────────────────────────────────────────────
+const p = BigInt(process.env.ELGAMAL_P);
+const g = BigInt(process.env.ELGAMAL_G);
+const x = BigInt(process.env.ELGAMAL_X);
+const y = BigInt(process.env.ELGAMAL_Y);
 
-/**
- * Encrypts plaintext data using AES-256-CBC.
- * @param {string} text - The readable plaintext data to encrypt.
- * @returns {object} An object containing the generated IV and the encrypted ciphertext (both in hex format).
- */
-function encryptAES(text) {
-    // 1. Generate a random Initialization Vector (IV).
-    // The IV must be exactly 16 bytes for AES. It ensures that encrypting the 
-    // same text multiple times results in completely different ciphertexts every time.
-    const iv = crypto.randomBytes(16);
-
-    // 2. Create the Cipher instance using the algorithm, the master key, and the random IV.
-    const cipher = crypto.createCipheriv(ALGORITHM, AES_KEY, iv);
-
-    // 3. Process the plaintext. 'utf8' is the input format, 'hex' is the output format.
-    let encrypted = cipher.update(text, 'utf8', 'hex');
-
-    // 4. Finalize the encryption (pads the data if necessary to fit the block size).
-    encrypted += cipher.final('hex');
-
-    // Return the IV and the encrypted data as hexadecimal strings so they can be safely stored in MongoDB.
-    return { iv: iv.toString('hex'), encryptedData: encrypted };
-}
-
-/**
- * Decrypts hexadecimal ciphertext back into readable plaintext.
- * @param {string} encryptedData - The scrambled ciphertext in hex format.
- * @param {string} ivHex - The Initialization Vector (in hex format) originally used to encrypt this specific data.
- * @returns {string} The original readable plaintext.
- */
-function decryptAES(encryptedData, ivHex) {
-    // 1. Convert the IV from a hex string back into a raw Buffer.
-    const iv = Buffer.from(ivHex, 'hex');
-
-    // 2. Create the Decipher instance using the same algorithm, master key, and the specific IV.
-    const decipher = crypto.createDecipheriv(ALGORITHM, AES_KEY, iv);
-
-    // 3. Process the ciphertext. 'hex' is the input format, 'utf8' is the desired output format.
-    let decrypted = decipher.update(encryptedData, 'hex', 'utf8');
-
-    // 4. Finalize the decryption (removes block padding).
-    decrypted += decipher.final('utf8');
-
-    return decrypted;
-}
-
-// --- DATABASE CONNECTION ---
-mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log('Connected to MongoDB Atlas'))
-    .catch(err => console.error('MongoDB connection error:', err));
-
-// =========================================================================
-// API ROUTES
-// =========================================================================
-
-// 1. Submit Feedback (Encrypts ALL fields before saving to DB)
-app.post('/api/feedback', async (req, res) => {
-    try {
-        const { classification, name, email, rating, feedbackText } = req.body;     
-        
-        // Encrypt each piece of data individually. 
-        // This generates a unique IV and Ciphertext for every single field.
-        const encClassification = encryptAES(classification);
-        const encName = encryptAES(name);
-        const encRating = encryptAES(rating.toString()); // Convert numbers to strings before encrypting
-        const encEmail = encryptAES(email);
-        const encFeedback = encryptAES(feedbackText);
-
-        // Store only the hex ciphertext and the IVs in the database. 
-        // The raw plaintext NEVER touches the database.
-        const newFeedback = new Feedback({
-            classification: encClassification.encryptedData, classificationIv: encClassification.iv,
-            name: encName.encryptedData, nameIv: encName.iv,
-            rating: encRating.encryptedData, ratingIv: encRating.iv,
-            encryptedEmail: encEmail.encryptedData, emailIv: encEmail.iv,
-            encryptedFeedback: encFeedback.encryptedData, feedbackIv: encFeedback.iv
-        });
-        
-        await newFeedback.save();
-        res.status(201).json({ message: 'Feedback fully encrypted and submitted!' });
-    } catch (error) {
-        res.status(500).json({ error: 'Server error' });
+// ─── ElGamal Core Engine ──────────────────────────────────────────────────────
+function power(base, exp, mod) {
+    let result = 1n;
+    base = base % mod;
+    while (exp > 0n) {
+        if (exp % 2n === 1n) result = (result * base) % mod;
+        base = (base * base) % mod;
+        exp = exp / 2n;
     }
+    return result;
+}
+
+function encryptElGamal(text) {
+    const msgHex = Buffer.from(text, 'utf8').toString('hex');
+    const m = BigInt('0x' + msgHex);
+    if (m >= p) throw new Error(`Message too large for prime P. Input: "${text}"`);
+    const k = BigInt('0x' + crypto.randomBytes(32).toString('hex')) % (p - 2n) + 1n;
+    const c1 = power(g, k, p);
+    const s  = power(y, k, p);
+    const c2 = (m * s) % p;
+    return { c1: c1.toString(), c2: c2.toString() };
+}
+
+function decryptElGamal(c1Str, c2Str) {
+    const c1 = BigInt(c1Str);
+    const c2 = BigInt(c2Str);
+    const s    = power(c1, x, p);
+    const sInv = power(s, p - 2n, p);
+    const m    = (c2 * sInv) % p;
+    let hex = m.toString(16);
+    if (hex.length % 2 !== 0) hex = '0' + hex;
+    return Buffer.from(hex, 'hex').toString('utf8');
+}
+
+// ─── Simple Token Store ───────────────────────────────────────────────────────
+let activeToken = null;
+
+// ─── Auth Middleware ──────────────────────────────────────────────────────────
+function requireAuth(req, res, next) {
+    const token = req.headers['authorization'];
+    if (!token || token !== activeToken) {
+        return res.status(401).json({ error: 'Unauthorized.' });
+    }
+    next();
+}
+
+// ─── Health Check ─────────────────────────────────────────────────────────────
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/public/index.html');
 });
 
-// 2. Admin Login (Generates JWT Session Token)
+// ─── Admin Login ──────────────────────────────────────────────────────────────
 app.post('/api/admin/login', (req, res) => {
     const { username, password } = req.body;
-    if (username === process.env.ADMIN_USER && password === process.env.ADMIN_PASS) {
-        // Issue a secure token valid for 1 hour to prevent unauthorized access
-        const token = jwt.sign({ classification: 'admin' }, process.env.JWT_SECRET, { expiresIn: '1h' });
-        res.json({ token });
+    if (
+        username === process.env.ADMIN_USERNAME &&
+        password === process.env.ADMIN_PASSWORD
+    ) {
+        activeToken = crypto.randomBytes(32).toString('hex');
+        res.status(200).json({ token: activeToken });
     } else {
-        res.status(401).json({ error: 'Invalid credentials' });
+        res.status(401).json({ error: 'Invalid credentials.' });
     }
 });
 
-// 3. Get Encrypted Dashboard Data
-// Fetches the raw ciphertext from the database and sends it to the frontend WITHOUT decrypting it.
-app.get('/api/admin/feedbacks', async (req, res) => {
-    const token = req.headers['authorization'];
-    if (!token) return res.status(403).json({ error: 'No token provided' });
+// ─── Get All Feedbacks (Encrypted) ───────────────────────────────────────────
+app.get('/api/admin/feedbacks', requireAuth, async (req, res) => {
     try {
-        jwt.verify(token, process.env.JWT_SECRET); // Verify admin session
-        const feedbacks = await Feedback.find().sort({ createdAt: -1 });
-        
-        // Map database response to strictly send encrypted strings
-        res.json(feedbacks.map(f => ({
-            id: f._id,
-            date: f.createdAt,
-            encClassification: f.classification, 
-            encName: f.name,
-            encRating: f.rating,
-            encEmail: f.encryptedEmail,
-            encMsg: f.encryptedFeedback
-        })));
-    } catch (error) { res.status(401).json({ error: 'Unauthorized' }); }
+        const records = await Feedback.find().sort({ createdAt: -1 });
+        const list = records.map(f => ({
+            id:                f._id,
+            date:              f.createdAt,
+            encName:           `c1:${f.name.c1.slice(0, 12)}...`,
+            encClassification: `c1:${f.classification.c1.slice(0, 12)}...`,
+            encEmail:          `c1:${f.encryptedEmail.c1.slice(0, 12)}...`,
+            encRating:         `c1:${f.rating.c1.slice(0, 12)}...`,
+            encMsg:            `c1:${f.encryptedFeedback.c1.slice(0, 12)}...`,
+        }));
+        res.status(200).json(list);
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to fetch records.', detail: err.message });
+    }
 });
 
-// 4. On-Demand Decryption (Decrypts a specific record when requested)
-app.post('/api/admin/decrypt/:id', async (req, res) => {
-    const token = req.headers['authorization'];
+// ─── Decrypt Single Record ────────────────────────────────────────────────────
+app.post('/api/admin/decrypt/:id', requireAuth, async (req, res) => {
     try {
-        jwt.verify(token, process.env.JWT_SECRET);
-        const f = await Feedback.findById(req.params.id);
-        
-        // Retrieve the ciphertext and its matching IV from the database,
-        // run them through the decryption function, and return the plaintext.
-        res.json({
-            classification: decryptAES(f.classification, f.classificationIv),
-            name: decryptAES(f.name, f.nameIv),
-            rating: decryptAES(f.rating, f.ratingIv),
-            email: decryptAES(f.encryptedEmail, f.emailIv),
-            message: decryptAES(f.encryptedFeedback, f.feedbackIv)
+        const record = await Feedback.findById(req.params.id);
+        if (!record) return res.status(404).json({ error: 'Record not found.' });
+        res.status(200).json({
+            name:           decryptElGamal(record.name.c1,              record.name.c2),
+            classification: decryptElGamal(record.classification.c1,    record.classification.c2),
+            email:          decryptElGamal(record.encryptedEmail.c1,    record.encryptedEmail.c2),
+            rating:         decryptElGamal(record.rating.c1,            record.rating.c2),
+            message:        decryptElGamal(record.encryptedFeedback.c1, record.encryptedFeedback.c2),
         });
-    } catch (error) { res.status(500).json({ error: 'Decryption failed' }); }
+    } catch (err) {
+        res.status(500).json({ error: 'Decryption failed.', detail: err.message });
+    }
 });
 
-// 5. Delete Feedback Record
-app.delete('/api/admin/feedback/:id', async (req, res) => {
-    const token = req.headers['authorization'];
+// ─── Delete Single Record ─────────────────────────────────────────────────────
+app.delete('/api/admin/feedback/:id', requireAuth, async (req, res) => {
     try {
-        jwt.verify(token, process.env.JWT_SECRET);
         await Feedback.findByIdAndDelete(req.params.id);
-        res.json({ message: 'Deleted' });
-    } catch (error) { res.status(401).json({ error: 'Unauthorized' }); }
+        res.status(200).json({ message: 'Record deleted.' });
+    } catch (err) {
+        res.status(500).json({ error: 'Delete failed.', detail: err.message });
+    }
 });
 
-app.listen(3000, () => console.log('Backend running on port 3000'));
+// ─── Submit Feedback ──────────────────────────────────────────────────────────
+app.post('/api/feedback', async (req, res) => {
+    try {
+        const { classification, name, email, rating, feedbackText } = req.body;
+        if (!classification || !rating || !feedbackText) {
+            return res.status(400).json({ error: 'Missing required fields.' });
+        }
+        const encryptedData = new Feedback({
+            classification:    encryptElGamal(classification),
+            name:              encryptElGamal(name  || 'Anonymous'),
+            rating:            encryptElGamal(String(rating)),
+            encryptedEmail:    encryptElGamal(email || 'Not provided'),
+            encryptedFeedback: encryptElGamal(feedbackText),
+        });
+        await encryptedData.save();
+        console.log(`✅ Feedback vaulted [${new Date().toISOString()}]`);
+        res.status(201).json({ message: '✅ Feedback encrypted and stored successfully.' });
+    } catch (err) {
+        console.error('❌ Encryption/Save Error:', err.message);
+        res.status(500).json({ error: 'Server error during encryption.', detail: err.message });
+    }
+});
+
+// ─── Server Start ─────────────────────────────────────────────────────────────
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

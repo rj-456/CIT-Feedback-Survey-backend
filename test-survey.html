@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UA-CIT · Survey Test Harness</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ua-blue: #004785;
+            --ua-blue-mid: #0060b0;
+            --accent: #00c6ff;
+            --success: #10b981;
+            --error: #ef4444;
+            --warn: #f59e0b;
+            --bg: #070d1a;
+            --surface: #0d1829;
+            --surface2: #111f36;
+            --border: rgba(0, 198, 255, 0.15);
+            --text: #e2eaf5;
+            --muted: #6b87a8;
+            --mono: 'Space Mono', monospace;
+            --sans: 'DM Sans', sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--sans);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px 80px;
+            background-image:
+                radial-gradient(ellipse 80% 50% at 50% -10%, rgba(0,71,133,0.35) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 30% at 90% 80%, rgba(0,198,255,0.06) 0%, transparent 60%);
+        }
+
+        /* ── Top Badge ── */
+        .env-badge {
+            font-family: var(--mono);
+            font-size: 0.7em;
+            background: rgba(0,198,255,0.08);
+            border: 1px solid var(--border);
+            color: var(--accent);
+            padding: 6px 14px;
+            border-radius: 4px;
+            letter-spacing: 0.08em;
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); animation: blink 1.4s ease infinite; }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+        /* ── Header ── */
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        .header .eyebrow {
+            font-family: var(--mono);
+            font-size: 0.72em;
+            letter-spacing: 0.18em;
+            color: var(--accent);
+            text-transform: uppercase;
+            margin-bottom: 14px;
+        }
+        .header h1 {
+            font-size: clamp(1.8em, 4vw, 2.8em);
+            font-weight: 600;
+            color: #fff;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+        }
+        .header h1 span { color: var(--accent); }
+        .header p {
+            color: var(--muted);
+            margin-top: 12px;
+            font-size: 0.95em;
+            font-weight: 300;
+        }
+
+        /* ── Main Grid ── */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            width: 100%;
+            max-width: 1000px;
+        }
+        @media (max-width: 700px) { .grid { grid-template-columns: 1fr; } }
+
+        /* ── Panel ── */
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .panel-header {
+            background: var(--surface2);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 22px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .panel-header .icon { font-size: 1.1em; }
+        .panel-header h2 {
+            font-family: var(--mono);
+            font-size: 0.78em;
+            letter-spacing: 0.1em;
+            color: var(--accent);
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+        .panel-body { padding: 24px; }
+
+        /* ── Form Elements ── */
+        .field { margin-bottom: 18px; }
+        .field label {
+            display: block;
+            font-size: 0.8em;
+            font-weight: 500;
+            color: var(--muted);
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin-bottom: 7px;
+        }
+        .field input,
+        .field select,
+        .field textarea {
+            width: 100%;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(0,198,255,0.2);
+            border-radius: 7px;
+            color: var(--text);
+            font-family: var(--sans);
+            font-size: 0.92em;
+            padding: 11px 14px;
+            outline: none;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .field input:focus,
+        .field select:focus,
+        .field textarea:focus {
+            border-color: var(--accent);
+            background: rgba(0,198,255,0.05);
+        }
+        .field select option { background: #0d1829; }
+        .field textarea { resize: vertical; min-height: 90px; }
+        .field input::placeholder,
+        .field textarea::placeholder { color: var(--muted); opacity: 0.6; }
+
+        /* ── Submit Button ── */
+        .btn-submit {
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--ua-blue), var(--ua-blue-mid));
+            color: #fff;
+            font-family: var(--mono);
+            font-size: 0.82em;
+            letter-spacing: 0.1em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 20px rgba(0,71,133,0.4);
+            margin-top: 6px;
+        }
+        .btn-submit:hover { background: linear-gradient(135deg, #0060b0, #0080d0); transform: translateY(-1px); }
+        .btn-submit:active { transform: translateY(0); }
+        .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        /* ── Log Panel ── */
+        .log-area {
+            font-family: var(--mono);
+            font-size: 0.75em;
+            line-height: 1.8;
+            min-height: 200px;
+            max-height: 420px;
+            overflow-y: auto;
+        }
+        .log-area::-webkit-scrollbar { width: 4px; }
+        .log-area::-webkit-scrollbar-track { background: transparent; }
+        .log-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+        .log-entry { display: flex; gap: 12px; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
+        .log-time { color: var(--muted); min-width: 80px; flex-shrink: 0; }
+        .log-msg { flex: 1; word-break: break-all; }
+        .log-info { color: var(--accent); }
+        .log-success { color: var(--success); }
+        .log-error { color: var(--error); }
+        .log-warn { color: var(--warn); }
+        .log-data { color: #a78bfa; }
+
+        .log-empty {
+            color: var(--muted);
+            font-family: var(--mono);
+            font-size: 0.78em;
+            text-align: center;
+            padding: 40px 20px;
+            opacity: 0.5;
+        }
+
+        /* ── Status Result ── */
+        .result-box {
+            margin-top: 16px;
+            padding: 14px 16px;
+            border-radius: 8px;
+            font-family: var(--mono);
+            font-size: 0.78em;
+            line-height: 1.6;
+            display: none;
+            word-break: break-all;
+        }
+        .result-box.success { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); color: var(--success); }
+        .result-box.error   { background: rgba(239,68,68,0.1);  border: 1px solid rgba(239,68,68,0.3);  color: var(--error); }
+
+        /* ── Config Row ── */
+        .config-row {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            margin-bottom: 20px;
+        }
+        .config-row .field { flex: 1; margin-bottom: 0; }
+        .btn-check {
+            padding: 11px 16px;
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            background: transparent;
+            color: var(--accent);
+            font-family: var(--mono);
+            font-size: 0.75em;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+            letter-spacing: 0.05em;
+        }
+        .btn-check:hover { background: rgba(0,198,255,0.08); border-color: var(--accent); }
+
+        /* ── Health indicator ── */
+        .health-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--mono);
+            font-size: 0.75em;
+            margin-bottom: 20px;
+            padding: 10px 14px;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+        }
+        .health-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); flex-shrink: 0; }
+        .health-dot.online { background: var(--success); animation: blink 2s ease infinite; }
+        .health-dot.offline { background: var(--error); }
+        .health-label { color: var(--muted); }
+        .health-status { color: var(--text); margin-left: auto; }
+
+        /* ── Full-width bottom panel ── */
+        .panel-full {
+            grid-column: 1 / -1;
+        }
+
+        /* ── Endpoint pills ── */
+        .endpoint-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+        .ep {
+            font-family: var(--mono);
+            font-size: 0.7em;
+            padding: 5px 12px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .ep:hover { border-color: var(--accent); color: var(--accent); background: rgba(0,198,255,0.05); }
+        .ep .method { font-weight: 700; margin-right: 5px; }
+        .ep .method.post { color: #f59e0b; }
+        .ep .method.get  { color: #10b981; }
+        .ep .method.del  { color: #ef4444; }
+
+        .clear-btn {
+            font-family: var(--mono);
+            font-size: 0.7em;
+            color: var(--muted);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: color 0.15s;
+            margin-left: auto;
+        }
+        .clear-btn:hover { color: var(--error); }
+    </style>
+</head>
+<body>
+
+    <div class="env-badge">
+        <div class="dot"></div>
+        TEST HARNESS · UA-CIT ELGAMAL FEEDBACK SYSTEM
+    </div>
+
+    <div class="header">
+        <div class="eyebrow">Developer Diagnostic Tool</div>
+        <h1>Frontend <span>↔</span> Backend</h1>
+        <p>Submit test feedback and verify ElGamal encryption end-to-end</p>
+    </div>
+
+    <div class="grid">
+
+        <!-- ── LEFT: Submit Form ── -->
+        <div class="panel">
+            <div class="panel-header">
+                <span class="icon">📤</span>
+                <h2>Submit Test Feedback</h2>
+            </div>
+            <div class="panel-body">
+
+                <div class="config-row">
+                    <div class="field">
+                        <label>Backend URL</label>
+                        <input type="text" id="backendUrl" value="http://localhost:3000">
+                    </div>
+                    <button class="btn-check" onclick="checkHealth()">Ping ↗</button>
+                </div>
+
+                <div class="health-row">
+                    <div class="health-dot" id="healthDot"></div>
+                    <span class="health-label">API Status:</span>
+                    <span class="health-status" id="healthStatus">Not checked</span>
+                </div>
+
+                <div class="field">
+                    <label>Classification *</label>
+                    <select id="classification">
+                        <option value="" disabled selected>Select...</option>
+                        <option value="Student">Student</option>
+                        <option value="Guardian">Guardian</option>
+                        <option value="Faculty/Staff">Faculty / Staff</option>
+                        <option value="Others">Others</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label>Name (optional)</label>
+                    <input type="text" id="name" placeholder="Leave blank for Anonymous">
+                </div>
+
+                <div class="field">
+                    <label>Email (optional)</label>
+                    <input type="email" id="email" placeholder="Leave blank for Not provided">
+                </div>
+
+                <div class="field">
+                    <label>Rating *</label>
+                    <select id="rating">
+                        <option value="" disabled selected>Select rating...</option>
+                        <option value="5">⭐⭐⭐⭐⭐ (5) - Excellent</option>
+                        <option value="4">⭐⭐⭐⭐ (4) - Good</option>
+                        <option value="3">⭐⭐⭐ (3) - Average</option>
+                        <option value="2">⭐⭐ (2) - Fair</option>
+                        <option value="1">⭐ (1) - Poor</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label>Feedback Message *</label>
+                    <textarea id="feedbackText" placeholder="Type your test message here..."></textarea>
+                </div>
+
+                <button class="btn-submit" id="submitBtn" onclick="submitFeedback()">
+                    ⚡ ENCRYPT &amp; SUBMIT
+                </button>
+
+                <div class="result-box" id="resultBox"></div>
+            </div>
+        </div>
+
+        <!-- ── RIGHT: Live Log ── -->
+        <div class="panel">
+            <div class="panel-header">
+                <span class="icon">🖥</span>
+                <h2>Request Log</h2>
+                <button class="clear-btn" onclick="clearLog()">clear</button>
+            </div>
+            <div class="panel-body">
+                <div class="log-area" id="logArea">
+                    <div class="log-empty">// Logs will appear here after actions</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── BOTTOM: Quick Tests ── -->
+        <div class="panel panel-full">
+            <div class="panel-header">
+                <span class="icon">🔬</span>
+                <h2>Quick Endpoint Tests</h2>
+            </div>
+            <div class="panel-body">
+                <div class="endpoint-list">
+                    <div class="ep" onclick="testEndpoint('GET', '/')">
+                        <span class="method get">GET</span>/
+                    </div>
+                    <div class="ep" onclick="testEndpoint('GET', '/api/feedback')">
+                        <span class="method get">GET</span>/api/feedback
+                    </div>
+                    <div class="ep" onclick="promptAdminLogin()">
+                        <span class="method post">POST</span>/api/admin/login
+                    </div>
+                    <div class="ep" onclick="testAdminFeedbacks()">
+                        <span class="method get">GET</span>/api/admin/feedbacks
+                    </div>
+                </div>
+                <div id="quickResult" class="log-area" style="min-height:120px;">
+                    <div class="log-empty">// Click an endpoint above to test it</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let adminToken = null;
+        const logArea = document.getElementById('logArea');
+
+        function getUrl(path = '') {
+            return document.getElementById('backendUrl').value.replace(/\/$/, '') + path;
+        }
+
+        function ts() {
+            return new Date().toLocaleTimeString('en-US', { hour12: false });
+        }
+
+        function log(msg, type = 'info') {
+            if (logArea.querySelector('.log-empty')) logArea.innerHTML = '';
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `<span class="log-time">${ts()}</span><span class="log-msg log-${type}">${msg}</span>`;
+            logArea.appendChild(entry);
+            logArea.scrollTop = logArea.scrollHeight;
+        }
+
+        function clearLog() {
+            logArea.innerHTML = '<div class="log-empty">// Logs cleared</div>';
+        }
+
+        async function checkHealth() {
+            const dot = document.getElementById('healthDot');
+            const status = document.getElementById('healthStatus');
+            log('Pinging backend...', 'info');
+            try {
+                const res = await fetch(getUrl('/'));
+                if (res.ok) {
+                    dot.className = 'health-dot online';
+                    status.textContent = '🟢 Online';
+                    status.style.color = '#10b981';
+                    log('✅ Backend reachable — ' + res.status + ' OK', 'success');
+                } else {
+                    throw new Error('Status ' + res.status);
+                }
+            } catch (e) {
+                dot.className = 'health-dot offline';
+                status.textContent = '🔴 Offline';
+                status.style.color = '#ef4444';
+                log('❌ Cannot reach backend: ' + e.message, 'error');
+            }
+        }
+
+        async function submitFeedback() {
+            const btn = document.getElementById('submitBtn');
+            const resultBox = document.getElementById('resultBox');
+            const classification = document.getElementById('classification').value;
+            const rating = document.getElementById('rating').value;
+            const feedbackText = document.getElementById('feedbackText').value.trim();
+
+            if (!classification || !rating || !feedbackText) {
+                resultBox.className = 'result-box error';
+                resultBox.style.display = 'block';
+                resultBox.textContent = '⚠ Please fill in Classification, Rating, and Message.';
+                return;
+            }
+
+            const payload = {
+                classification,
+                name:        document.getElementById('name').value.trim()  || 'Anonymous',
+                email:       document.getElementById('email').value.trim() || 'Not provided',
+                rating,
+                feedbackText
+            };
+
+            log('Sending payload → ' + JSON.stringify(payload).slice(0, 80) + '...', 'info');
+            btn.disabled = true;
+            btn.textContent = '⏳ ENCRYPTING...';
+            resultBox.style.display = 'none';
+
+            try {
+                const res = await fetch(getUrl('/api/feedback'), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    log('✅ 201 Created — ElGamal encryption successful', 'success');
+                    log('Server response: ' + JSON.stringify(data), 'data');
+                    resultBox.className = 'result-box success';
+                    resultBox.textContent = '✅ ' + (data.message || 'Stored successfully');
+                } else {
+                    log('❌ ' + res.status + ' — ' + JSON.stringify(data), 'error');
+                    resultBox.className = 'result-box error';
+                    resultBox.textContent = '❌ ' + (data.error || 'Server error');
+                }
+                resultBox.style.display = 'block';
+            } catch (e) {
+                log('❌ Network error: ' + e.message, 'error');
+                resultBox.className = 'result-box error';
+                resultBox.textContent = '❌ Connection failed: ' + e.message;
+                resultBox.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '⚡ ENCRYPT & SUBMIT';
+            }
+        }
+
+        async function testEndpoint(method, path) {
+            const area = document.getElementById('quickResult');
+            area.innerHTML = '';
+            const addLine = (msg, type = 'info') => {
+                const el = document.createElement('div');
+                el.className = `log-entry log-${type}`;
+                el.innerHTML = `<span class="log-time">${ts()}</span><span class="log-msg log-${type}">${msg}</span>`;
+                area.appendChild(el);
+            };
+
+            addLine(`→ ${method} ${getUrl(path)}`, 'info');
+            try {
+                const res = await fetch(getUrl(path), { method });
+                const text = await res.text();
+                addLine(`← ${res.status} ${res.statusText}`, res.ok ? 'success' : 'error');
+                try {
+                    const json = JSON.parse(text);
+                    addLine(JSON.stringify(json, null, 2).slice(0, 500), 'data');
+                } catch {
+                    addLine(text.slice(0, 300), 'data');
+                }
+            } catch (e) {
+                addLine('❌ ' + e.message, 'error');
+            }
+        }
+
+        async function promptAdminLogin() {
+            const area = document.getElementById('quickResult');
+            area.innerHTML = '';
+            const addLine = (msg, type = 'info') => {
+                const el = document.createElement('div');
+                el.className = 'log-entry';
+                el.innerHTML = `<span class="log-time">${ts()}</span><span class="log-msg log-${type}">${msg}</span>`;
+                area.appendChild(el);
+            };
+
+            const username = prompt('Admin username:');
+            const password = prompt('Admin password:');
+            if (!username || !password) { addLine('Login cancelled.', 'warn'); return; }
+
+            addLine('→ POST /api/admin/login', 'info');
+            try {
+                const res = await fetch(getUrl('/api/admin/login'), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await res.json();
+                if (data.token) {
+                    adminToken = data.token;
+                    addLine('✅ Login successful — token stored', 'success');
+                    addLine('Token: ' + adminToken.slice(0, 20) + '...', 'data');
+                } else {
+                    addLine('❌ ' + (data.error || 'Invalid credentials'), 'error');
+                }
+            } catch (e) {
+                addLine('❌ ' + e.message, 'error');
+            }
+        }
+
+        async function testAdminFeedbacks() {
+            const area = document.getElementById('quickResult');
+            area.innerHTML = '';
+            const addLine = (msg, type = 'info') => {
+                const el = document.createElement('div');
+                el.className = 'log-entry';
+                el.innerHTML = `<span class="log-time">${ts()}</span><span class="log-msg log-${type}">${msg}</span>`;
+                area.appendChild(el);
+            };
+
+            if (!adminToken) {
+                addLine('⚠ No admin token — click POST /api/admin/login first', 'warn');
+                return;
+            }
+            addLine('→ GET /api/admin/feedbacks', 'info');
+            try {
+                const res = await fetch(getUrl('/api/admin/feedbacks'), {
+                    headers: { 'Authorization': adminToken }
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    addLine(`✅ ${data.length} record(s) found`, 'success');
+                    data.slice(0, 3).forEach((f, i) => {
+                        addLine(`[${i+1}] ID: ${f.id} | ${f.encName} | ${new Date(f.date).toLocaleDateString()}`, 'data');
+                    });
+                    if (data.length > 3) addLine(`... and ${data.length - 3} more`, 'muted');
+                } else {
+                    addLine('❌ ' + JSON.stringify(data), 'error');
+                }
+            } catch (e) {
+                addLine('❌ ' + e.message, 'error');
+            }
+        }
+
+        // Auto-ping on load
+        window.addEventListener('load', () => setTimeout(checkHealth, 500));
+    </script>
+</body>
+</html>
