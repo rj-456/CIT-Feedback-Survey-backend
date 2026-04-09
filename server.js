@@ -16,41 +16,101 @@ mongoose.connect(process.env.MONGODB_URI)
     .catch(err => console.error('❌ MongoDB Error:', err));
 
 // ─── ElGamal Key Setup ────────────────────────────────────────────────────────
+/**
+ * ELGAMAL ASYMMETRIC CRYPTOGRAPHY PARAMETERS
+ * In asymmetric encryption, there is a public key (for encrypting) 
+ * and a private key (for decrypting).
+ * * p: The Safe Prime. A massive number that defines the mathematical "field".
+ * g: The Generator. Used as the base for exponentiation.
+ * x: The PRIVATE KEY. Only known to the server. Kept secret to decrypt data.
+ * y: The PUBLIC KEY. Derived from (g^x mod p). Used to encrypt data.
+ */
 const p = BigInt(process.env.ELGAMAL_P);
 const g = BigInt(process.env.ELGAMAL_G);
 const x = BigInt(process.env.ELGAMAL_X);
 const y = BigInt(process.env.ELGAMAL_Y);
 
 // ─── ElGamal Core Engine ──────────────────────────────────────────────────────
+
+/**
+ * MODULAR EXPONENTIATION (base^exp % mod)
+ * This is the heart of ElGamal. It calculates extremely large powers 
+ * without causing memory overflow (which Math.pow would do).
+ * It uses the "Square-and-Multiply" algorithm for efficiency.
+ */
 function power(base, exp, mod) {
     let result = 1n;
     base = base % mod;
     while (exp > 0n) {
+        // If the current bit of the exponent is 1, multiply the result
         if (exp % 2n === 1n) result = (result * base) % mod;
+        // Square the base for the next iteration
         base = (base * base) % mod;
+        // Shift to the next bit
         exp = exp / 2n;
     }
     return result;
 }
 
+/**
+ * ELGAMAL ENCRYPTION FUNCTION
+ * Converts plaintext text into a pair of ciphertexts (c1, c2).
+ */
 function encryptElGamal(text) {
+    // 1. Encoding: Convert the text string into a numerical format (Hex to BigInt)
+    // ElGamal math only works on numbers, not text characters.
     const msgHex = Buffer.from(text, 'utf8').toString('hex');
     const m = BigInt('0x' + msgHex);
+
+    // Safety Check: The numerical message (m) MUST be smaller than the prime (p)
     if (m >= p) throw new Error(`Message too large for prime P. Input: "${text}"`);
+    
+    // 2. Ephemeral Key (k): Generate a random, one-time-use key for this specific message.
+    // This ensures that encrypting the same text twice yields completely different ciphertexts.
     const k = BigInt('0x' + crypto.randomBytes(32).toString('hex')) % (p - 2n) + 1n;
+
+    // 3. Calculate c1: The "clue" needed by the receiver to reconstruct the shared secret.
+    // c1 = g^k mod p
     const c1 = power(g, k, p);
+
+    // 4. Calculate Shared Secret (s): Combine the public key (y) with the ephemeral key (k).
+    // s = y^k mod p
     const s  = power(y, k, p);
+
+    // 5. Calculate c2: Mask the actual message (m) using the shared secret (s).
+    // c2 = (m * s) mod p
     const c2 = (m * s) % p;
+
+    // Return the ciphertext pair as strings for safe database storage
     return { c1: c1.toString(), c2: c2.toString() };
 }
 
+/**
+ * ELGAMAL DECRYPTION FUNCTION
+ * Reconstructs the original text using the private key (x) and the ciphertext pair (c1, c2).
+ */
 function decryptElGamal(c1Str, c2Str) {
     const c1 = BigInt(c1Str);
     const c2 = BigInt(c2Str);
+
+    // 1. Reconstruct the Shared Secret (s):
+    // The magic of ElGamal: c1^x mod p is mathematically identical to y^k mod p.
+    // We use our private key (x) to unlock it.
     const s    = power(c1, x, p);
+
+    // 2. Calculate the Modular Inverse (s^-1):
+    // To "divide" c2 by s to get m, we must multiply by the modular inverse of s.
+    // We use Fermat's Little Theorem: s^-1 = s^(p-2) mod p.
     const sInv = power(s, p - 2n, p);
+
+    // 3. Recover the original numerical message (m):
+    // m = (c2 * s^-1) mod p
     const m    = (c2 * sInv) % p;
+
+    // 4. Decoding: Convert the numerical BigInt back into a readable UTF-8 string.
     let hex = m.toString(16);
+
+    // Ensure the hex string has an even number of characters before converting to a Buffer
     if (hex.length % 2 !== 0) hex = '0' + hex;
     return Buffer.from(hex, 'hex').toString('utf8');
 }
